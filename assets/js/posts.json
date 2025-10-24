@@ -1,79 +1,97 @@
-<!-- 建議保留你原本的 <section id="feed"></section> 容器 -->
-<section id="feed" class="feed"></section>
-
-<script>
-(async function boot(){
-  const box = document.getElementById('feed');
-  box.innerHTML = '載入中…';
-
-  // 先嘗試 /assets/posts.json；404 時退回 /Bruce/assets/posts.json
-  async function fetchJSON(path){
-    const res = await fetch(path + '?v=' + Date.now(), { cache: 'no-store' });
-    if (!res.ok) throw new Error('HTTP ' + res.status + ' at ' + path);
-    return res.json();
+[
+  {
+    "id": "我的日記本（雲端版）上線筆記",
+    "title": "我的日記本（雲端版）上線筆記",
+    "date": "2025-10-19",
+    "tags": [
+      "專案",
+      "前端",
+      "雲端"
+    ],
+    "html": "<p>把「我的日記本」升級為雲端版：新增優惠券折抵、圖表、分析頁等。後續計畫將加入多帳本、CSV 匯入與跨裝置同步。</p>\n       <ul><li>UI：Tailwind + React UMD</li><li>圖表：Chart.js</li><li>支援：優惠券代碼折抵</li></ul>"
+  },
+  {
+    "id": "line-提醒機器人-render-+-cloudflare-workers-架構",
+    "title": "LINE 提醒機器人：Render + Cloudflare Workers 架構",
+    "date": "2025-10-11",
+    "tags": [
+      "自動化",
+      "LINE",
+      "Webhook"
+    ],
+    "html": "<p>透過 Cloudflare Workers 反向代理 LINE Webhook 到 Render，達成 24H 穩定在線。支援指令：\n       <code>明天 8:00 提醒交作業</code> 之類的自然語句解析；之後會再加入 n8n 排程與 Google 日曆同步。</p>"
+  },
+  {
+    "id": "超擬真賽車原型-漂移評分、粒子特效與手機體感",
+    "title": "超擬真賽車原型：漂移評分、粒子特效與手機體感",
+    "date": "2025-10-22",
+    "tags": [
+      "遊戲",
+      "WebGL",
+      "Side-Project"
+    ],
+    "html": "<p>做了一款網頁版賽車原型，支援曲率/起伏賽道、碰撞火花、輪胎痕跡與裝飾顆粒；\n       目標是接近市面手遊等級，並提供連線排行榜與幽靈車。</p>"
+  },
+  {
+    "id": "嘉成攝影-一頁式作品集改版",
+    "title": "嘉成攝影：一頁式作品集改版",
+    "date": "2025-09-25",
+    "tags": [
+      "攝影",
+      "網站"
+    ],
+    "html": "<p>作品集改版為深色系金色點綴，強化婚禮與人像專案呈現，並增加社群分享圖（OG image）。</p>"
+  },
+  {
+    "id": "股票功能模組-個股走勢、新聞、csv-excel-導入",
+    "title": "股票功能模組：個股走勢、新聞、CSV/Excel 導入",
+    "date": "2025-10-11",
+    "tags": [
+      "專案",
+      "資料視覺化"
+    ],
+    "html": "<p>為 SuperTool 加入股票功能：即時 1 分鐘走勢、個股新聞、CSV/Excel 批次導入代碼、主題色套用到圖表。</p>"
+  },
+  {
+    "id": "ai-智慧鏡-raspberry-pi-4-+-homekit-+-語音助手",
+    "title": "AI 智慧鏡：Raspberry Pi 4 + HomeKit + 語音助手",
+    "date": "2025-02-09",
+    "tags": [
+      "硬體",
+      "智慧家庭",
+      "Raspberry Pi"
+    ],
+    "html": "<p>規劃一面 AI 智慧鏡：顯示時鐘、資訊看板、觸控與聲控喚醒；整合 HomeKit 與捷徑，自動化日常操作。</p>"
+  },
+  {
+    "id": "幫家人做的音樂比賽網站",
+    "title": "幫家人做的音樂比賽網站",
+    "date": "2025-10-14",
+    "tags": [
+      "家人",
+      "音樂",
+      "網站"
+    ],
+    "html": "<p>整理洪嘉胤的比賽經歷與作品，打造簡潔的比賽/作品頁，並加上聯絡資訊。</p>"
+  },
+  {
+    "id": "網域與郵件規劃-jiachang.com-與品牌信箱",
+    "title": "網域與郵件規劃：jiachang.com 與品牌信箱",
+    "date": "2025-10-15",
+    "tags": [
+      "網域",
+      "Email"
+    ],
+    "html": "<p>規劃購買 <code>jiachang.com</code> 並設定子路徑 <code>/supertool</code>；同時評估品牌郵箱（如 <code>happy@jiachang-supertool.com</code>）。</p>"
+  },
+  {
+    "id": "facebook-近況（外部連結）",
+    "title": "Facebook 近況（外部連結）",
+    "date": "2025-10-24",
+    "tags": [
+      "Facebook",
+      "近況"
+    ],
+    "html": "<p>我的 Facebook 近況都會更新在這裡：</p>\n       <p><a href=\"https://www.facebook.com/share/1PfCVEH4Mo/?mibextid=wwXIfr\" target=\"_blank\" rel=\"noopener\">前往我的 Facebook 分享</a></p>"
   }
-
-  let data;
-  try {
-    data = await fetchJSON('assets/posts.json');
-  } catch(e1){
-    try {
-      data = await fetchJSON('Bruce/assets/posts.json');
-    } catch(e2){
-      console.error(e1, e2);
-      box.innerHTML = '<p>讀取失敗（找不到 posts.json）。請確認路徑在 <code>assets/posts.json</code> 或 <code>Bruce/assets/posts.json</code>。</p>';
-      return;
-    }
-  }
-
-  // 兼容兩種格式：[{...}] 或 {items:[...]}
-  const posts = Array.isArray(data) ? data : (data.items || []);
-  if (!Array.isArray(posts)) {
-    console.error('posts.json 內容不是陣列或 items 陣列：', data);
-    box.innerHTML = '<p>posts.json 格式錯誤：需要陣列或 {items:[...]}</p>';
-    return;
-  }
-
-  // 時間新到舊
-  posts.sort((a,b)=> new Date(b.time) - new Date(a.time));
-
-  // 簡單渲染
-  const html = posts.map(p => {
-    const img = p.image ? `<a href="${p.url||'#'}" target="_blank" rel="noopener">
-      <img src="${p.image}" alt="" loading="lazy"></a>` : '';
-    const feel = p.feeling ? `｜心情：${p.feeling}` : '';
-    const place = p.place ? `｜地點：${p.place}` : '';
-    const when = new Date(p.time);
-    const time = isNaN(when) ? (p.time||'') : when.toLocaleString('zh-TW',{hour12:false});
-    const msg = (p.message||'').replace(/(https?:\/\/[^\s]+)/g, u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`).replace(/\n/g,'<br>');
-    const link = p.url ? `<a class="link" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看</a>` : '';
-    return `
-      <article class="post">
-        ${img}
-        <div class="meta">
-          <time>${time}</time>
-          ${link}
-        </div>
-        <div class="submeta">${[feel, place].filter(Boolean).join(' ')}</div>
-        <p class="msg">${msg}</p>
-      </article>
-    `;
-  }).join('');
-
-  box.innerHTML = html || '<p>目前沒有貼文。</p>';
-
-  // 少量樣式（可移到你的 CSS）
-  const css = `
-    .feed{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:16px 0}
-    .post{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
-    .post img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
-    .post .meta{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;font-size:.875rem;color:#475569}
-    .post .submeta{padding:0 12px 8px;color:#64748b;font-size:.85rem}
-    .post .msg{padding:0 12px 12px;line-height:1.6}
-    @media (prefers-color-scheme: dark){
-      .post{background:#0b1220;border-color:#1f2937;color:#e5e7eb}
-      .post .meta,.post .submeta{color:#9aa4b2}
-    }`;
-  const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
-})();
-</script>
+]
