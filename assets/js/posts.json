@@ -1,58 +1,79 @@
-{
-  "items": [
-    {
-      "id": "2020-11-12-birthday-1",
-      "time": "2020-11-12T12:10:00+08:00",
-      "message": "2020年11月12日嘉成生日快樂-1",
-      "image": "images/2020-11-12-2.jpg",
-      "url": "https://www.facebook.com/share/v/1F3k6frcT2/?mibextid=wwXIfr",
-      "feeling": "",
-      "place": "高雄市"
-    },
-    {
-      "id": "2020-11-12-birthday-album",
-      "time": "2020-11-12T12:00:00+08:00",
-      "message": "2020年11月12日（嘉成）生日快樂",
-      "image": "images/2020-11-12-1.jpg",
-      "url": "https://www.facebook.com/share/p/15MqbzKvdtg/?mibextid=wwXIfr",
-      "feeling": "",
-      "place": "高雄市"
-    },
-    {
-      "id": "2020-11-08-ride-2-96km",
-      "time": "2020-11-08T09:00:00+08:00",
-      "message": "今天從家裡騎腳踏車去阿嬤家共 2.96km",
-      "image": "images/2020-11-08-1.jpg",
-      "url": "https://www.facebook.com/share/p/17FnhwMcjc/?mibextid=wwXIfr",
-      "feeling": "開心",
-      "place": "高雄市"
-    },
-    {
-      "id": "2020-11-01-dad-desk-bike",
-      "time": "2020-11-01T20:00:00+08:00",
-      "message": "2020年10月27日爸爸🧔 謝謝您買書桌 and 腳踏車🚴 給我\nOctober 27, 2020 Dad 🧔 Thank you for buying a desk and bicycle 🚴 give me",
-      "image": "images/2020-11-01-1.jpg",
-      "url": "https://www.facebook.com/share/p/1DJCiMsTnB/?mibextid=wwXIfr",
-      "feeling": "正面積極",
-      "place": "路竹區"
-    },
-    {
-      "id": "2020-10-31-papaya-milk",
-      "time": "2020-10-31T19:30:00+08:00",
-      "message": "好熱～來杯（木瓜牛奶）",
-      "image": "images/2020-10-31-1.jpg",
-      "url": "https://www.facebook.com/share/p/1Anvub6Zpa/?mibextid=wwXIfr",
-      "feeling": "",
-      "place": ""
-    },
-    {
-      "id": "2020-11-xx-extra",
-      "time": "2020-11-12T12:15:00+08:00",
-      "message": "（待補文字）",
-      "image": "",
-      "url": "https://www.facebook.com/share/p/1DEhss9N7b/?mibextid=wwXIfr",
-      "feeling": "",
-      "place": ""
+<!-- 建議保留你原本的 <section id="feed"></section> 容器 -->
+<section id="feed" class="feed"></section>
+
+<script>
+(async function boot(){
+  const box = document.getElementById('feed');
+  box.innerHTML = '載入中…';
+
+  // 先嘗試 /assets/posts.json；404 時退回 /Bruce/assets/posts.json
+  async function fetchJSON(path){
+    const res = await fetch(path + '?v=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error('HTTP ' + res.status + ' at ' + path);
+    return res.json();
+  }
+
+  let data;
+  try {
+    data = await fetchJSON('assets/posts.json');
+  } catch(e1){
+    try {
+      data = await fetchJSON('Bruce/assets/posts.json');
+    } catch(e2){
+      console.error(e1, e2);
+      box.innerHTML = '<p>讀取失敗（找不到 posts.json）。請確認路徑在 <code>assets/posts.json</code> 或 <code>Bruce/assets/posts.json</code>。</p>';
+      return;
     }
-  ]
-}
+  }
+
+  // 兼容兩種格式：[{...}] 或 {items:[...]}
+  const posts = Array.isArray(data) ? data : (data.items || []);
+  if (!Array.isArray(posts)) {
+    console.error('posts.json 內容不是陣列或 items 陣列：', data);
+    box.innerHTML = '<p>posts.json 格式錯誤：需要陣列或 {items:[...]}</p>';
+    return;
+  }
+
+  // 時間新到舊
+  posts.sort((a,b)=> new Date(b.time) - new Date(a.time));
+
+  // 簡單渲染
+  const html = posts.map(p => {
+    const img = p.image ? `<a href="${p.url||'#'}" target="_blank" rel="noopener">
+      <img src="${p.image}" alt="" loading="lazy"></a>` : '';
+    const feel = p.feeling ? `｜心情：${p.feeling}` : '';
+    const place = p.place ? `｜地點：${p.place}` : '';
+    const when = new Date(p.time);
+    const time = isNaN(when) ? (p.time||'') : when.toLocaleString('zh-TW',{hour12:false});
+    const msg = (p.message||'').replace(/(https?:\/\/[^\s]+)/g, u=>`<a href="${u}" target="_blank" rel="noopener">${u}</a>`).replace(/\n/g,'<br>');
+    const link = p.url ? `<a class="link" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看</a>` : '';
+    return `
+      <article class="post">
+        ${img}
+        <div class="meta">
+          <time>${time}</time>
+          ${link}
+        </div>
+        <div class="submeta">${[feel, place].filter(Boolean).join(' ')}</div>
+        <p class="msg">${msg}</p>
+      </article>
+    `;
+  }).join('');
+
+  box.innerHTML = html || '<p>目前沒有貼文。</p>';
+
+  // 少量樣式（可移到你的 CSS）
+  const css = `
+    .feed{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:16px;margin:16px 0}
+    .post{background:#fff;border:1px solid #e5e7eb;border-radius:12px;overflow:hidden}
+    .post img{width:100%;display:block;aspect-ratio:4/3;object-fit:cover}
+    .post .meta{display:flex;justify-content:space-between;gap:8px;padding:8px 12px;font-size:.875rem;color:#475569}
+    .post .submeta{padding:0 12px 8px;color:#64748b;font-size:.85rem}
+    .post .msg{padding:0 12px 12px;line-height:1.6}
+    @media (prefers-color-scheme: dark){
+      .post{background:#0b1220;border-color:#1f2937;color:#e5e7eb}
+      .post .meta,.post .submeta{color:#9aa4b2}
+    }`;
+  const s = document.createElement('style'); s.textContent = css; document.head.appendChild(s);
+})();
+</script>
