@@ -1,0 +1,152 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title data-name>個人網站</title>
+  <meta name="description" content="我的個人網站：作品集、相簿、最新近況與聯絡方式。"/>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
+  <meta property="og:title" content="我的個人網站"/>
+  <meta property="og:description" content="作品集、相簿、最新近況與聯絡方式。"/>
+  <meta property="og:image" content="assets/img/avatar.svg"/>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container wrap">
+      <a class="brand" href="#top">
+        <img src="assets/img/favicon.svg" alt="logo"/>
+        <b data-name>我的網站</b>
+      </a>
+      <div class="right">
+        <a href="#about">關於</a>
+        <a href="#projects">專案</a>
+        <a href="#gallery">相簿</a>
+        <a href="#updates">近況</a>
+        <a href="posts.html">文章</a>
+        <a href="#contact">聯絡</a>
+        <button id="themeToggle" aria-label="切換主題">🌗</button>
+      </div>
+    </div>
+  </nav>
+
+  <main id="top" class="container">
+    <section class="hero">
+      <div class="box">
+        <div class="avatar"><img src="assets/img/avatar.svg" alt="avatar" width="140" height="140"/></div>
+        <div>
+          <h1><span data-name>你的名字</span>｜<small data-tagline>把生活與作品放在同一個家</small></h1>
+          <p data-bio>嗨！這是我的個人網站。我喜歡攝影、程式與旅行。這裡會分享我的專案、相片與最新近況。</p>
+          <div class="cta">
+            <a class="btn" href="#projects">✨ 看作品</a>
+            <a class="btn" href="#contact">📬 聯絡我</a>
+            <a class="btn" data-facebook target="_blank" rel="noopener" href="#">📘 Facebook</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about" class="section">
+      <div class="card">
+        <div class="badge">關於我</div>
+        <p style="margin:.6rem 0 0">目前在 <span data-location>Taiwan</span>，熱愛把腦袋裡的點子變成實際的成品。這個網站是我在網路上的基地。</p>
+        <ul id="quick-links" style="display:flex; flex-wrap:wrap; gap:10px; list-style:none; padding:0; margin:16px 0 0">
+          <li><a class="btn" data-github target="_blank" rel="noopener" href="#">GitHub</a></li>
+        </ul>
+      </div>
+    </section>
+
+    <section id="projects" class="section">
+      <h2 style="margin:0 0 12px">專案精選</h2>
+      <div class="grid cards">
+        <article class="card">
+          <h3>SuperTool｜個人生產力工具</h3>
+          <p>記帳、待辦、筆記與圖表的整合網站。支援行動版與雲端同步。</p>
+          <a class="btn" href="#" target="_blank" rel="noopener">開啟專案</a>
+        </article>
+        <article class="card">
+          <h3>攝影作品集｜嘉成攝影</h3>
+          <p>婚禮與人像拍攝精選，呈現最自然的情感與瞬間。</p>
+          <a class="btn" href="#" target="_blank" rel="noopener">開啟作品</a>
+        </article>
+        <article class="card">
+          <h3>旅遊記事｜我的足跡地圖</h3>
+          <p>用地圖與相片記錄每一段旅程，和想去的下一站。</p>
+          <a class="btn" href="#" target="_blank" rel="noopener">看地圖</a>
+        </article>
+      </div>
+    </section>
+
+    <section id="gallery" class="section">
+      <h2 style="margin:0 0 12px">相簿</h2>
+      <div class="grid gallery">
+        <img src="assets/img/avatar.svg" alt="gallery 1"/>
+        <img src="assets/img/avatar.svg" alt="gallery 2"/>
+        <img src="assets/img/avatar.svg" alt="gallery 3"/>
+        <img src="assets/img/avatar.svg" alt="gallery 4"/>
+      </div>
+    </section>
+
+    <section id="updates" class="section">
+      <h2 style="margin:0 0 12px">最新近況</h2>
+      <div class="card">
+        <p>我會把 Facebook 的重點貼文放在這裡：</p>
+        <p><a class="btn" data-facebook target="_blank" rel="noopener" href="#">前往我的 Facebook 近況</a></p>
+        <hr class="sep"/>
+        <p style="margin:0; font-size:.9rem; color:#9fb0c9">提醒：Facebook 內嵌需要公開權限或粉專貼文，否則建議使用按鈕連結。</p>
+      </div>
+    </section>
+
+    <section id="contact" class="section">
+      <h2 style="margin:0 0 12px">聯絡</h2>
+      <div class="card">
+        <p>歡迎來信或私訊社群平台：</p>
+        <p><a data-email href="mailto:you@example.com">you@example.com</a></p>
+        <p style="display:flex; gap:10px; flex-wrap:wrap">
+          <a class="btn" data-facebook target="_blank" rel="noopener" href="#">Facebook</a>
+          <a class="btn" data-instagram target="_blank" rel="noopener" href="#">Instagram</a>
+          <a class="btn" data-github target="_blank" rel="noopener" href="#">GitHub</a>
+          <a class="btn" data-threads target="_blank" rel="noopener" href="#">Threads</a>
+        </p>
+      </div>
+    </section>
+
+    <section id="blog" class="section">
+      <h2 style="margin:0 0 12px">最新文章</h2>
+      <div id="latest-posts" class="grid"></div>
+      <p style="margin-top:12px"><a class="btn" href="posts.html">查看全部文章</a></p>
+    </section>
+
+    <div class="footer">
+      <div class="container">
+        <small>© <span id="y"></span> <span data-name>你的名字</span>. All rights reserved.</small>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('y').textContent = new Date().getFullYear();
+  </script>
+  <script src="assets/js/main.js"></script>
+
+<script>
+(async ()=>{
+  try{
+    const res = await fetch('assets/js/posts.json');
+    const posts = await res.json();
+    posts.sort((a,b)=> (a.date<b.date?1:-1));
+    const latest = posts.slice(0,3);
+    const box = document.getElementById('latest-posts');
+    box.innerHTML = latest.map(p=>`
+      <article class="card">
+        <h3 style="margin:0">${p.title}</h3>
+        <small style="opacity:.8">${p.date}</small>
+        <p style="margin:.5rem 0 1rem">${(p.html.replace(/<[^>]+>/g,'').slice(0,100))}...</p>
+        <p><a class="btn" href="posts.html#${p.id}">閱讀全文</a></p>
+      </article>`).join('');
+  }catch(e){}
+})();
+</script>
+
+</body>
+</html>

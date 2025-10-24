@@ -1,0 +1,21 @@
+{
+  "name": "你的名字",
+  "tagline": "把生活與作品放在同一個家",
+  "bio": "嗨！這是我的個人網站。我喜歡攝影、程式與旅行。這裡會分享我的專案、相片與最新近況。",
+  "location": "Taiwan",
+  "email": "you@example.com",
+  "facebook": "https://www.facebook.com/share/1PfCVEH4Mo/?mibextid=wwXIfr",
+  "instagram": "",
+  "github": "https://github.com/Jiachang1112",
+  "threads": "",
+  "links": [
+    {
+      "label": "我的 Facebook 貼文",
+      "href": "https://www.facebook.com/share/1PfCVEH4Mo/?mibextid=wwXIfr"
+    },
+    {
+      "label": "作品集 Google 相簿",
+      "href": "#"
+    }
+  ]
+}
