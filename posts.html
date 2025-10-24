@@ -35,12 +35,14 @@
   </main>
 
   <script>
+  // -------- 共用小工具 --------
   function formatDate(s){
     const d = new Date(s + 'T00:00:00');
-    if (!isNaN(d)) return d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
-    return s;
+    return isNaN(d) ? s : d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
   }
   function tagBadge(t){ return `<span class="badge">${t}</span>` }
+
+  // -------- 渲染（保留你原 UI） --------
   function renderList(items){
     const list = document.getElementById('list');
     list.innerHTML = items.map(p => `
@@ -49,28 +51,29 @@
         <div style="display:flex; gap:8px; align-items:center; margin:6px 0 10px">
           <small style="opacity:.8">${formatDate(p.date)}</small>
           <span>•</span>
-          ${p.tags.map(tagBadge).join(' ')}
+          ${(p.tags||[]).map(tagBadge).join(' ')}
         </div>
-        <p style="margin:0 0 12px; opacity:.95">${(p.html.replace(/<[^>]+>/g,'').slice(0,110))}...</p>
+        <p style="margin:0 0 12px; opacity:.95">${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...</p>
         <p><a class="btn" href="posts.html#${p.id}">閱讀全文</a></p>
       </article>
     `).join('');
   }
+
   function renderFilters(items){
-    const set = new Set();
-    items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
-    const filters = document.getElementById('filters');
+    const set = new Set(); items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
     const all = Array.from(set).sort();
+    const filters = document.getElementById('filters');
     filters.innerHTML = ['全部', ...all].map(t=>`<a class="btn" href="#" data-filter="${t}">${t}</a>`).join('');
     filters.querySelectorAll('a').forEach(a=>a.addEventListener('click', e=>{
       e.preventDefault();
       const f = a.dataset.filter;
-      const filtered = f==='全部' ? window.__posts : window.__posts.filter(p=>p.tags.includes(f));
+      const filtered = f==='全部' ? window.__posts : window.__posts.filter(p=>(p.tags||[]).includes(f));
       renderList(filtered);
       history.replaceState(null, '', 'posts.html');
       document.getElementById('viewer').style.display = 'none';
     }));
   }
+
   function renderViewer(p){
     const v = document.getElementById('viewer');
     v.style.display = 'block';
@@ -79,38 +82,84 @@
       <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
         <small style="opacity:.8">${formatDate(p.date)}</small>
         <span>•</span>
-        ${p.tags.map(tagBadge).join(' ')}
+        ${(p.tags||[]).map(tagBadge).join(' ')}
       </div>
-      <div>${p.html}</div>
+      <div>${p.html||''}</div>
       <p style="margin-top:16px"><a class="btn" href="posts.html">← 返回列表</a></p>
     `;
     window.scrollTo({top:0, behavior:'smooth'});
   }
+
+  // -------- 主程式：相容兩種 posts.json --------
   async function boot(){
-    const res = await fetch('assets/js/posts.json');
-    const posts = await res.json();
-    // sort by date desc
-    posts.sort((a,b)=> (a.date<b.date?1:-1));
-    window.__posts = posts;
-    renderFilters(posts);
-    renderList(posts);
-    // route by hash
-    const id = location.hash.slice(1);
-    if(id){
-      const p = posts.find(x=>x.id===id);
-      if(p){ renderViewer(p); }
+    const listEl = document.getElementById('list');
+    const viewerEl = document.getElementById('viewer');
+    listEl.innerHTML = '載入中…';
+
+    async function fetchJSON(path){
+      const res = await fetch(path + '?v=' + Date.now(), { cache:'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' @ ' + path);
+      return res.json();
     }
-    window.addEventListener('hashchange', ()=>{
+
+    let raw;
+    try {
+      raw = await fetchJSON('assets/js/posts.json');
+    } catch(e1){
+      try {
+        raw = await fetchJSON('Bruce/assets/js/posts.json');
+      } catch(e2){
+        console.error(e1, e2);
+        listEl.innerHTML = '<p>❌ 讀取失敗：找不到 <code>assets/js/posts.json</code> 或 <code>Bruce/assets/js/posts.json</code>。</p>';
+        return;
+      }
+    }
+
+    // ① 部落格格式：[{ id,title,date,tags,html }]
+    if (Array.isArray(raw)) {
+      window.__posts = raw.slice().sort((a,b)=> (a.date<b.date?1:-1));
+    }
+    // ② Facebook 格式：{ items:[{ id,time,message,image,url,feeling,place }] }
+    else if (raw && Array.isArray(raw.items)) {
+      const converted = raw.items.map(p=>{
+        const date = (p.time||'').slice(0,10);
+        const title = (p.message||'').split('\n')[0].slice(0,30) || 'Facebook 貼文';
+        const tags = ['Facebook']
+          .concat(p.place ? [p.place] : [])
+          .concat(p.feeling ? [p.feeling] : []);
+        const timeText = p.time ? new Date(p.time).toLocaleString('zh-TW',{hour12:false}) : '';
+        const html =
+          (p.image ? `<p><img src="${p.image}" alt="" style="max-width:100%;border-radius:12px"/></p>` : '') +
+          `<p style="opacity:.85">時間：${timeText}${p.place ? '｜地點：'+p.place : ''}${p.feeling ? '｜心情：'+p.feeling : ''}</p>` +
+          `<p>${(p.message||'').replace(/\n/g,'<br>')}</p>` +
+          (p.url ? `<p><a class="btn" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看</a></p>` : '');
+        return { id:p.id, title, date, tags, html };
+      });
+      window.__posts = converted.sort((a,b)=> (a.date<b.date?1:-1));
+    }
+    else {
+      listEl.innerHTML = '<p>⚠️ posts.json 格式錯誤（需為陣列或 {items:[...]}）。</p>';
+      console.error('格式錯誤：', raw);
+      return;
+    }
+
+    renderFilters(window.__posts);
+    renderList(window.__posts);
+
+    function route(){
       const id = location.hash.slice(1);
-      if(!id){ document.getElementById('viewer').style.display = 'none'; return }
-      const p = posts.find(x=>x.id===id);
-      if(p){ renderViewer(p); }
-    });
-    // theme btn
+      if(!id){ viewerEl.style.display='none'; return; }
+      const p = window.__posts.find(x=>x.id===id);
+      if(p) renderViewer(p);
+    }
+    route();
+    window.addEventListener('hashchange', route);
+
+    // 主題切換（保留）
     const t = localStorage.getItem('theme'); if(t) document.documentElement.dataset.theme = t;
     document.getElementById('themeToggle').addEventListener('click', ()=>{
       const dark = document.documentElement.dataset.theme !== 'light';
-      document.documentElement.dataset.theme = dark ? 'light':'dark';
+      document.documentElement.dataset.theme = dark ? 'light' : 'dark';
       localStorage.setItem('theme', document.documentElement.dataset.theme);
     });
   }
