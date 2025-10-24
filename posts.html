@@ -7,6 +7,14 @@
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
   <link rel="stylesheet" href="assets/css/style.css"/>
   <meta name="description" content="我的文章與專案紀錄"/>
+  <style>
+    .all-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+    .all-list .item{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px 12px;border:1px solid #334155;border-radius:10px}
+    .all-list .left{min-width:0}
+    .all-list .title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .all-list .meta{opacity:.75;font-size:.85rem}
+    .btn.sm{padding:4px 10px;font-size:.85rem;border-radius:6px;border:1px solid #64748b;text-decoration:none}
+  </style>
 </head>
 <body>
   <nav class="nav">
@@ -35,14 +43,14 @@
   </main>
 
   <script>
-  // -------- 共用小工具 --------
+  // -------- 工具 --------
   function formatDate(s){
     const d = new Date(s + 'T00:00:00');
     return isNaN(d) ? s : d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
   }
   function tagBadge(t){ return `<span class="badge">${t}</span>` }
 
-  // -------- 渲染（保留你原 UI） --------
+  // -------- 列表 --------
   function renderList(items){
     const list = document.getElementById('list');
     list.innerHTML = items.map(p => `
@@ -54,11 +62,15 @@
           ${(p.tags||[]).map(tagBadge).join(' ')}
         </div>
         <p style="margin:0 0 12px; opacity:.95">${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...</p>
-        <p><a class="btn" href="posts.html#${p.id}">閱讀全文</a></p>
+        <p>
+          <a class="btn" href="posts.html#${p.id}">閱讀全文</a>
+          ${p.fbURL ? ` <a class="btn" href="${p.fbURL}" target="_blank" rel="noopener">Facebook 連結 ↗</a>` : ''}
+        </p>
       </article>
     `).join('');
   }
 
+  // -------- 篩選 --------
   function renderFilters(items){
     const set = new Set(); items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
     const all = Array.from(set).sort();
@@ -74,9 +86,25 @@
     }));
   }
 
+  // -------- 詳閱（顯示 FB 連結 + 所有文章清單）--------
   function renderViewer(p){
     const v = document.getElementById('viewer');
     v.style.display = 'block';
+
+    // 底下「所有文章」清單
+    const allHTML = window.__posts.map(x => `
+      <div class="item">
+        <div class="left">
+          <div class="title">${x.title}</div>
+          <div class="meta">${formatDate(x.date)}　${(x.tags||[]).slice(0,3).join(' / ')}</div>
+        </div>
+        <div class="right">
+          <a class="btn sm" href="posts.html#${x.id}">閱讀</a>
+          ${x.fbURL ? ` <a class="btn sm" href="${x.fbURL}" target="_blank" rel="noopener" title="在 Facebook 查看">FB ↗</a>` : ''}
+        </div>
+      </div>
+    `).join('');
+
     v.innerHTML = `
       <h2 style="margin:0 0 12px">${p.title}</h2>
       <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
@@ -84,7 +112,12 @@
         <span>•</span>
         ${(p.tags||[]).map(tagBadge).join(' ')}
       </div>
+      ${p.fbURL ? `<p><a class="btn" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a></p>` : ''}
       <div>${p.html||''}</div>
+
+      <h3 style="margin:22px 0 10px">所有文章</h3>
+      <div class="all-list">${allHTML}</div>
+
       <p style="margin-top:16px"><a class="btn" href="posts.html">← 返回列表</a></p>
     `;
     window.scrollTo({top:0, behavior:'smooth'});
@@ -115,9 +148,9 @@
       }
     }
 
-    // ① 部落格格式：[{ id,title,date,tags,html }]
+    // ① 部落格格式：[{ id,title,date,tags,html, fbURL? }]
     if (Array.isArray(raw)) {
-      window.__posts = raw.slice().sort((a,b)=> (a.date<b.date?1:-1));
+      window.__posts = raw.slice().map(p=>({ ...p, fbURL: p.fbURL || null })).sort((a,b)=> (a.date<b.date?1:-1));
     }
     // ② Facebook 格式：{ items:[{ id,time,message,image,url,feeling,place }] }
     else if (raw && Array.isArray(raw.items)) {
@@ -132,8 +165,8 @@
           (p.image ? `<p><img src="${p.image}" alt="" style="max-width:100%;border-radius:12px"/></p>` : '') +
           `<p style="opacity:.85">時間：${timeText}${p.place ? '｜地點：'+p.place : ''}${p.feeling ? '｜心情：'+p.feeling : ''}</p>` +
           `<p>${(p.message||'').replace(/\n/g,'<br>')}</p>` +
-          (p.url ? `<p><a class="btn" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看</a></p>` : '');
-        return { id:p.id, title, date, tags, html };
+          (p.url ? `<p><a class="btn" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a></p>` : '');
+        return { id:p.id, title, date, tags, html, fbURL: p.url || null };
       });
       window.__posts = converted.sort((a,b)=> (a.date<b.date?1:-1));
     }
