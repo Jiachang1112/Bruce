@@ -7,14 +7,6 @@
   <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
   <link rel="stylesheet" href="assets/css/style.css"/>
   <meta name="description" content="我的文章與專案紀錄"/>
-  <style>
-    .post-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
-    .card img{width:100%;border-radius:12px;margin-bottom:8px;aspect-ratio:4/3;object-fit:cover}
-    .meta{display:flex;justify-content:space-between;align-items:center;font-size:.85rem;opacity:.8;margin-bottom:6px}
-    .submeta{color:#9aa4b2;font-size:.85rem;margin-bottom:10px}
-    .msg{white-space:pre-wrap;line-height:1.6;margin-bottom:12px}
-    .btn{padding:6px 12px;border-radius:6px;border:1px solid #ccc;text-decoration:none;font-size:.9rem}
-  </style>
 </head>
 <body>
   <nav class="nav">
@@ -35,74 +27,94 @@
   </nav>
 
   <main class="container section">
-    <h1 style="margin:0 0 12px">Facebook 文章</h1>
-    <div id="feed" class="post-grid"></div>
+    <h1 style="margin:0 0 12px">文章</h1>
+    <div id="filters" style="display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 20px"></div>
+    <div id="list" class="grid"></div>
+    <hr class="sep"/>
+    <article id="viewer" class="card" style="display:none"></article>
   </main>
 
   <script>
+  function formatDate(s){
+    const d = new Date(s + 'T00:00:00');
+    if (!isNaN(d)) return d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
+    return s;
+  }
+  function tagBadge(t){ return `<span class="badge">${t}</span>` }
+  function renderList(items){
+    const list = document.getElementById('list');
+    list.innerHTML = items.map(p => `
+      <article class="card">
+        <h3 style="margin:0">${p.title}</h3>
+        <div style="display:flex; gap:8px; align-items:center; margin:6px 0 10px">
+          <small style="opacity:.8">${formatDate(p.date)}</small>
+          <span>•</span>
+          ${p.tags.map(tagBadge).join(' ')}
+        </div>
+        <p style="margin:0 0 12px; opacity:.95">${(p.html.replace(/<[^>]+>/g,'').slice(0,110))}...</p>
+        <p><a class="btn" href="posts.html#${p.id}">閱讀全文</a></p>
+      </article>
+    `).join('');
+  }
+  function renderFilters(items){
+    const set = new Set();
+    items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
+    const filters = document.getElementById('filters');
+    const all = Array.from(set).sort();
+    filters.innerHTML = ['全部', ...all].map(t=>`<a class="btn" href="#" data-filter="${t}">${t}</a>`).join('');
+    filters.querySelectorAll('a').forEach(a=>a.addEventListener('click', e=>{
+      e.preventDefault();
+      const f = a.dataset.filter;
+      const filtered = f==='全部' ? window.__posts : window.__posts.filter(p=>p.tags.includes(f));
+      renderList(filtered);
+      history.replaceState(null, '', 'posts.html');
+      document.getElementById('viewer').style.display = 'none';
+    }));
+  }
+  function renderViewer(p){
+    const v = document.getElementById('viewer');
+    v.style.display = 'block';
+    v.innerHTML = `
+      <h2 style="margin:0 0 12px">${p.title}</h2>
+      <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
+        <small style="opacity:.8">${formatDate(p.date)}</small>
+        <span>•</span>
+        ${p.tags.map(tagBadge).join(' ')}
+      </div>
+      <div>${p.html}</div>
+      <p style="margin-top:16px"><a class="btn" href="posts.html">← 返回列表</a></p>
+    `;
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
   async function boot(){
-    const feed = document.getElementById('feed');
-    feed.innerHTML = '載入中…';
-
-    // 嘗試多路徑抓 JSON
-    async function fetchJSON(path){
-      const res = await fetch(path + '?v=' + Date.now(), { cache:'no-store' });
-      if(!res.ok) throw new Error('HTTP '+res.status);
-      return res.json();
+    const res = await fetch('assets/js/posts.json');
+    const posts = await res.json();
+    // sort by date desc
+    posts.sort((a,b)=> (a.date<b.date?1:-1));
+    window.__posts = posts;
+    renderFilters(posts);
+    renderList(posts);
+    // route by hash
+    const id = location.hash.slice(1);
+    if(id){
+      const p = posts.find(x=>x.id===id);
+      if(p){ renderViewer(p); }
     }
-
-    let data;
-    try{
-      data = await fetchJSON('assets/posts.json');
-    }catch(e1){
-      try{
-        data = await fetchJSON('Bruce/assets/posts.json');
-      }catch(e2){
-        feed.innerHTML = '<p>讀取失敗，請確認 posts.json 路徑。</p>';
-        console.error(e1, e2);
-        return;
-      }
-    }
-
-    const posts = Array.isArray(data) ? data : (data.items||[]);
-    if(!Array.isArray(posts)){
-      feed.innerHTML = '<p>posts.json 格式錯誤。</p>';
-      console.error('posts 格式：', data);
-      return;
-    }
-
-    posts.sort((a,b)=> new Date(b.time) - new Date(a.time));
-
-    const html = posts.map(p=>{
-      const img = p.image ? `<img src="${p.image}" alt="photo" loading="lazy">` : '';
-      const feel = p.feeling ? `｜心情：${p.feeling}` : '';
-      const place = p.place ? `｜地點：${p.place}` : '';
-      const when = new Date(p.time);
-      const time = isNaN(when)?(p.time||''):when.toLocaleString('zh-TW',{hour12:false});
-      const msg = (p.message||'').replace(/\n/g,'<br>').replace(/(https?:\/\/[^\s]+)/g, u=>`<a href="${u}" target="_blank">${u}</a>`);
-      const link = p.url ? `<a href="${p.url}" class="btn" target="_blank">在 Facebook 查看</a>`:'';
-      return `
-        <article class="card">
-          ${img}
-          <div class="meta"><time>${time}</time>${link}</div>
-          <div class="submeta">${[feel, place].filter(Boolean).join(' ')}</div>
-          <p class="msg">${msg}</p>
-        </article>
-      `;
-    }).join('');
-    feed.innerHTML = html || '<p>目前沒有貼文。</p>';
-
-    // 主題切換保留
-    const t = localStorage.getItem('theme');
-    if(t) document.documentElement.dataset.theme = t;
-    document.getElementById('themeToggle').addEventListener('click',()=>{
-      const dark = document.documentElement.dataset.theme!=='light';
-      document.documentElement.dataset.theme = dark?'light':'dark';
-      localStorage.setItem('theme',document.documentElement.dataset.theme);
+    window.addEventListener('hashchange', ()=>{
+      const id = location.hash.slice(1);
+      if(!id){ document.getElementById('viewer').style.display = 'none'; return }
+      const p = posts.find(x=>x.id===id);
+      if(p){ renderViewer(p); }
+    });
+    // theme btn
+    const t = localStorage.getItem('theme'); if(t) document.documentElement.dataset.theme = t;
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const dark = document.documentElement.dataset.theme !== 'light';
+      document.documentElement.dataset.theme = dark ? 'light':'dark';
+      localStorage.setItem('theme', document.documentElement.dataset.theme);
     });
   }
-
-  document.addEventListener('DOMContentLoaded',boot);
+  document.addEventListener('DOMContentLoaded', boot);
   </script>
 </body>
 </html>
