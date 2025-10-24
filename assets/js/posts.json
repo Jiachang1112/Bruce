@@ -1,97 +1,169 @@
-[
-  {
-    "id": "我的日記本（雲端版）上線筆記",
-    "title": "我的日記本（雲端版）上線筆記",
-    "date": "2025-10-19",
-    "tags": [
-      "專案",
-      "前端",
-      "雲端"
-    ],
-    "html": "<p>把「我的日記本」升級為雲端版：新增優惠券折抵、圖表、分析頁等。後續計畫將加入多帳本、CSV 匯入與跨裝置同步。</p>\n       <ul><li>UI：Tailwind + React UMD</li><li>圖表：Chart.js</li><li>支援：優惠券代碼折抵</li></ul>"
-  },
-  {
-    "id": "line-提醒機器人-render-+-cloudflare-workers-架構",
-    "title": "LINE 提醒機器人：Render + Cloudflare Workers 架構",
-    "date": "2025-10-11",
-    "tags": [
-      "自動化",
-      "LINE",
-      "Webhook"
-    ],
-    "html": "<p>透過 Cloudflare Workers 反向代理 LINE Webhook 到 Render，達成 24H 穩定在線。支援指令：\n       <code>明天 8:00 提醒交作業</code> 之類的自然語句解析；之後會再加入 n8n 排程與 Google 日曆同步。</p>"
-  },
-  {
-    "id": "超擬真賽車原型-漂移評分、粒子特效與手機體感",
-    "title": "超擬真賽車原型：漂移評分、粒子特效與手機體感",
-    "date": "2025-10-22",
-    "tags": [
-      "遊戲",
-      "WebGL",
-      "Side-Project"
-    ],
-    "html": "<p>做了一款網頁版賽車原型，支援曲率/起伏賽道、碰撞火花、輪胎痕跡與裝飾顆粒；\n       目標是接近市面手遊等級，並提供連線排行榜與幽靈車。</p>"
-  },
-  {
-    "id": "嘉成攝影-一頁式作品集改版",
-    "title": "嘉成攝影：一頁式作品集改版",
-    "date": "2025-09-25",
-    "tags": [
-      "攝影",
-      "網站"
-    ],
-    "html": "<p>作品集改版為深色系金色點綴，強化婚禮與人像專案呈現，並增加社群分享圖（OG image）。</p>"
-  },
-  {
-    "id": "股票功能模組-個股走勢、新聞、csv-excel-導入",
-    "title": "股票功能模組：個股走勢、新聞、CSV/Excel 導入",
-    "date": "2025-10-11",
-    "tags": [
-      "專案",
-      "資料視覺化"
-    ],
-    "html": "<p>為 SuperTool 加入股票功能：即時 1 分鐘走勢、個股新聞、CSV/Excel 批次導入代碼、主題色套用到圖表。</p>"
-  },
-  {
-    "id": "ai-智慧鏡-raspberry-pi-4-+-homekit-+-語音助手",
-    "title": "AI 智慧鏡：Raspberry Pi 4 + HomeKit + 語音助手",
-    "date": "2025-02-09",
-    "tags": [
-      "硬體",
-      "智慧家庭",
-      "Raspberry Pi"
-    ],
-    "html": "<p>規劃一面 AI 智慧鏡：顯示時鐘、資訊看板、觸控與聲控喚醒；整合 HomeKit 與捷徑，自動化日常操作。</p>"
-  },
-  {
-    "id": "幫家人做的音樂比賽網站",
-    "title": "幫家人做的音樂比賽網站",
-    "date": "2025-10-14",
-    "tags": [
-      "家人",
-      "音樂",
-      "網站"
-    ],
-    "html": "<p>整理洪嘉胤的比賽經歷與作品，打造簡潔的比賽/作品頁，並加上聯絡資訊。</p>"
-  },
-  {
-    "id": "網域與郵件規劃-jiachang.com-與品牌信箱",
-    "title": "網域與郵件規劃：jiachang.com 與品牌信箱",
-    "date": "2025-10-15",
-    "tags": [
-      "網域",
-      "Email"
-    ],
-    "html": "<p>規劃購買 <code>jiachang.com</code> 並設定子路徑 <code>/supertool</code>；同時評估品牌郵箱（如 <code>happy@jiachang-supertool.com</code>）。</p>"
-  },
-  {
-    "id": "facebook-近況（外部連結）",
-    "title": "Facebook 近況（外部連結）",
-    "date": "2025-10-24",
-    "tags": [
-      "Facebook",
-      "近況"
-    ],
-    "html": "<p>我的 Facebook 近況都會更新在這裡：</p>\n       <p><a href=\"https://www.facebook.com/share/1PfCVEH4Mo/?mibextid=wwXIfr\" target=\"_blank\" rel=\"noopener\">前往我的 Facebook 分享</a></p>"
+<!doctype html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>文章 | 我的網站</title>
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <meta name="description" content="我的文章與專案紀錄"/>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container wrap">
+      <a class="brand" href="index.html">
+        <img src="assets/img/favicon.svg" alt="logo"/>
+        <b>我的網站</b>
+      </a>
+      <div class="right">
+        <a href="index.html#about">關於</a>
+        <a href="index.html#projects">專案</a>
+        <a href="index.html#gallery">相簿</a>
+        <a href="posts.html">文章</a>
+        <a href="index.html#contact">聯絡</a>
+        <button id="themeToggle" aria-label="切換主題">🌗</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container section">
+    <h1 style="margin:0 0 12px">文章</h1>
+    <div id="filters" style="display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 20px"></div>
+    <div id="list" class="grid"></div>
+    <hr class="sep"/>
+    <article id="viewer" class="card" style="display:none"></article>
+  </main>
+
+  <script>
+  // -------- 共用小工具 --------
+  function formatDate(s){
+    const d = new Date(s + 'T00:00:00');
+    return isNaN(d) ? s : d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
   }
-]
+  function tagBadge(t){ return `<span class="badge">${t}</span>` }
+
+  // -------- 渲染（保留你原 UI） --------
+  function renderList(items){
+    const list = document.getElementById('list');
+    list.innerHTML = items.map(p => `
+      <article class="card">
+        <h3 style="margin:0">${p.title}</h3>
+        <div style="display:flex; gap:8px; align-items:center; margin:6px 0 10px">
+          <small style="opacity:.8">${formatDate(p.date)}</small>
+          <span>•</span>
+          ${(p.tags||[]).map(tagBadge).join(' ')}
+        </div>
+        <p style="margin:0 0 12px; opacity:.95">${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...</p>
+        <p><a class="btn" href="posts.html#${p.id}">閱讀全文</a></p>
+      </article>
+    `).join('');
+  }
+
+  function renderFilters(items){
+    const set = new Set(); items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
+    const all = Array.from(set).sort();
+    const filters = document.getElementById('filters');
+    filters.innerHTML = ['全部', ...all].map(t=>`<a class="btn" href="#" data-filter="${t}">${t}</a>`).join('');
+    filters.querySelectorAll('a').forEach(a=>a.addEventListener('click', e=>{
+      e.preventDefault();
+      const f = a.dataset.filter;
+      const filtered = f==='全部' ? window.__posts : window.__posts.filter(p=>(p.tags||[]).includes(f));
+      renderList(filtered);
+      history.replaceState(null, '', 'posts.html');
+      document.getElementById('viewer').style.display = 'none';
+    }));
+  }
+
+  function renderViewer(p){
+    const v = document.getElementById('viewer');
+    v.style.display = 'block';
+    v.innerHTML = `
+      <h2 style="margin:0 0 12px">${p.title}</h2>
+      <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
+        <small style="opacity:.8">${formatDate(p.date)}</small>
+        <span>•</span>
+        ${(p.tags||[]).map(tagBadge).join(' ')}
+      </div>
+      <div>${p.html||''}</div>
+      <p style="margin-top:16px"><a class="btn" href="posts.html">← 返回列表</a></p>
+    `;
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+
+  // -------- 主程式：相容兩種 posts.json --------
+  async function boot(){
+    const listEl = document.getElementById('list');
+    const viewerEl = document.getElementById('viewer');
+    listEl.innerHTML = '載入中…';
+
+    async function fetchJSON(path){
+      const res = await fetch(path + '?v=' + Date.now(), { cache:'no-store' });
+      if (!res.ok) throw new Error('HTTP ' + res.status + ' @ ' + path);
+      return res.json();
+    }
+
+    let raw;
+    try {
+      raw = await fetchJSON('assets/js/posts.json');
+    } catch(e1){
+      try {
+        raw = await fetchJSON('Bruce/assets/js/posts.json');
+      } catch(e2){
+        console.error(e1, e2);
+        listEl.innerHTML = '<p>❌ 讀取失敗：找不到 <code>assets/js/posts.json</code> 或 <code>Bruce/assets/js/posts.json</code>。</p>';
+        return;
+      }
+    }
+
+    // ① 部落格格式：[{ id,title,date,tags,html }]
+    if (Array.isArray(raw)) {
+      window.__posts = raw.slice().sort((a,b)=> (a.date<b.date?1:-1));
+    }
+    // ② Facebook 格式：{ items:[{ id,time,message,image,url,feeling,place }] }
+    else if (raw && Array.isArray(raw.items)) {
+      const converted = raw.items.map(p=>{
+        const date = (p.time||'').slice(0,10);
+        const title = (p.message||'').split('\n')[0].slice(0,30) || 'Facebook 貼文';
+        const tags = ['Facebook']
+          .concat(p.place ? [p.place] : [])
+          .concat(p.feeling ? [p.feeling] : []);
+        const timeText = p.time ? new Date(p.time).toLocaleString('zh-TW',{hour12:false}) : '';
+        const html =
+          (p.image ? `<p><img src="${p.image}" alt="" style="max-width:100%;border-radius:12px"/></p>` : '') +
+          `<p style="opacity:.85">時間：${timeText}${p.place ? '｜地點：'+p.place : ''}${p.feeling ? '｜心情：'+p.feeling : ''}</p>` +
+          `<p>${(p.message||'').replace(/\n/g,'<br>')}</p>` +
+          (p.url ? `<p><a class="btn" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看</a></p>` : '');
+        return { id:p.id, title, date, tags, html };
+      });
+      window.__posts = converted.sort((a,b)=> (a.date<b.date?1:-1));
+    }
+    else {
+      listEl.innerHTML = '<p>⚠️ posts.json 格式錯誤（需為陣列或 {items:[...]}）。</p>';
+      console.error('格式錯誤：', raw);
+      return;
+    }
+
+    renderFilters(window.__posts);
+    renderList(window.__posts);
+
+    function route(){
+      const id = location.hash.slice(1);
+      if(!id){ viewerEl.style.display='none'; return; }
+      const p = window.__posts.find(x=>x.id===id);
+      if(p) renderViewer(p);
+    }
+    route();
+    window.addEventListener('hashchange', route);
+
+    // 主題切換（保留）
+    const t = localStorage.getItem('theme'); if(t) document.documentElement.dataset.theme = t;
+    document.getElementById('themeToggle').addEventListener('click', ()=>{
+      const dark = document.documentElement.dataset.theme !== 'light';
+      document.documentElement.dataset.theme = dark ? 'light' : 'dark';
+      localStorage.setItem('theme', document.documentElement.dataset.theme);
+    });
+  }
+  document.addEventListener('DOMContentLoaded', boot);
+  </script>
+</body>
+</html>
