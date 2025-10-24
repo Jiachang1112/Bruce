@@ -1,169 +1,58 @@
-<!doctype html>
-<html lang="zh-Hant" data-theme="dark">
-<head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>文章 | 我的網站</title>
-  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml"/>
-  <link rel="stylesheet" href="assets/css/style.css"/>
-  <meta name="description" content="我的文章與專案紀錄"/>
-</head>
-<body>
-  <nav class="nav">
-    <div class="container wrap">
-      <a class="brand" href="index.html">
-        <img src="assets/img/favicon.svg" alt="logo"/>
-        <b>我的網站</b>
-      </a>
-      <div class="right">
-        <a href="index.html#about">關於</a>
-        <a href="index.html#projects">專案</a>
-        <a href="index.html#gallery">相簿</a>
-        <a href="posts.html">文章</a>
-        <a href="index.html#contact">聯絡</a>
-        <button id="themeToggle" aria-label="切換主題">🌗</button>
-      </div>
-    </div>
-  </nav>
-
-  <main class="container section">
-    <h1 style="margin:0 0 12px">文章</h1>
-    <div id="filters" style="display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 20px"></div>
-    <div id="list" class="grid"></div>
-    <hr class="sep"/>
-    <article id="viewer" class="card" style="display:none"></article>
-  </main>
-
-  <script>
-  // -------- 共用小工具 --------
-  function formatDate(s){
-    const d = new Date(s + 'T00:00:00');
-    return isNaN(d) ? s : d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
-  }
-  function tagBadge(t){ return `<span class="badge">${t}</span>` }
-
-  // -------- 渲染（保留你原 UI） --------
-  function renderList(items){
-    const list = document.getElementById('list');
-    list.innerHTML = items.map(p => `
-      <article class="card">
-        <h3 style="margin:0">${p.title}</h3>
-        <div style="display:flex; gap:8px; align-items:center; margin:6px 0 10px">
-          <small style="opacity:.8">${formatDate(p.date)}</small>
-          <span>•</span>
-          ${(p.tags||[]).map(tagBadge).join(' ')}
-        </div>
-        <p style="margin:0 0 12px; opacity:.95">${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...</p>
-        <p><a class="btn" href="posts.html#${p.id}">閱讀全文</a></p>
-      </article>
-    `).join('');
-  }
-
-  function renderFilters(items){
-    const set = new Set(); items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
-    const all = Array.from(set).sort();
-    const filters = document.getElementById('filters');
-    filters.innerHTML = ['全部', ...all].map(t=>`<a class="btn" href="#" data-filter="${t}">${t}</a>`).join('');
-    filters.querySelectorAll('a').forEach(a=>a.addEventListener('click', e=>{
-      e.preventDefault();
-      const f = a.dataset.filter;
-      const filtered = f==='全部' ? window.__posts : window.__posts.filter(p=>(p.tags||[]).includes(f));
-      renderList(filtered);
-      history.replaceState(null, '', 'posts.html');
-      document.getElementById('viewer').style.display = 'none';
-    }));
-  }
-
-  function renderViewer(p){
-    const v = document.getElementById('viewer');
-    v.style.display = 'block';
-    v.innerHTML = `
-      <h2 style="margin:0 0 12px">${p.title}</h2>
-      <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
-        <small style="opacity:.8">${formatDate(p.date)}</small>
-        <span>•</span>
-        ${(p.tags||[]).map(tagBadge).join(' ')}
-      </div>
-      <div>${p.html||''}</div>
-      <p style="margin-top:16px"><a class="btn" href="posts.html">← 返回列表</a></p>
-    `;
-    window.scrollTo({top:0, behavior:'smooth'});
-  }
-
-  // -------- 主程式：相容兩種 posts.json --------
-  async function boot(){
-    const listEl = document.getElementById('list');
-    const viewerEl = document.getElementById('viewer');
-    listEl.innerHTML = '載入中…';
-
-    async function fetchJSON(path){
-      const res = await fetch(path + '?v=' + Date.now(), { cache:'no-store' });
-      if (!res.ok) throw new Error('HTTP ' + res.status + ' @ ' + path);
-      return res.json();
+{
+  "items": [
+    {
+      "id": "2020-11-12-birthday-1",
+      "time": "2020-11-12T12:10:00+08:00",
+      "message": "2020年11月12日嘉成生日快樂-1 🎂",
+      "image": "images/2020-11-12-2.jpg",
+      "url": "https://www.facebook.com/share/v/1F3k6frcT2/?mibextid=wwXIfr",
+      "feeling": "慶祝生日",
+      "place": "高雄市"
+    },
+    {
+      "id": "2020-11-12-birthday-album",
+      "time": "2020-11-12T12:00:00+08:00",
+      "message": "2020年11月12日（嘉成）生日快樂 🎂",
+      "image": "images/2020-11-12-1.jpg",
+      "url": "https://www.facebook.com/share/p/15MqbzKvdtg/?mibextid=wwXIfr",
+      "feeling": "開心",
+      "place": "高雄市"
+    },
+    {
+      "id": "2020-11-08-ride-2-96km",
+      "time": "2020-11-08T09:00:00+08:00",
+      "message": "今天從家裡騎腳踏車去阿嬤家共 2.96km 🚴‍♂️",
+      "image": "images/2020-11-08-1.jpg",
+      "url": "https://www.facebook.com/share/p/17FnhwMcjc/?mibextid=wwXIfr",
+      "feeling": "覺得開心",
+      "place": "高雄市"
+    },
+    {
+      "id": "2020-11-01-dad-bike",
+      "time": "2020-11-01T11:00:00+08:00",
+      "message": "2020年10月27日爸爸 😇 謝謝您買書桌 and 腳踏車 🚴‍♂️ 給我\nOctober 27, 2020 Dad 😇 Thank you for buying a desk and bicycle 🚲 give me",
+      "image": "images/2020-10-27-1.jpg",
+      "url": "https://www.facebook.com/share/p/1DJCiMsTnB/?mibextid=wwXIfr",
+      "feeling": "覺得正面積極",
+      "place": "路竹區"
+    },
+    {
+      "id": "2020-10-31-watermelon-milk",
+      "time": "2020-10-31T14:30:00+08:00",
+      "message": "好熱～來杯（木瓜牛奶）🥤",
+      "image": "images/2020-10-31-1.jpg",
+      "url": "https://www.facebook.com/share/p/1Anvub6Zpa/?mibextid=wwXIfr",
+      "feeling": "覺得放鬆",
+      "place": "高雄市"
+    },
+    {
+      "id": "2020-11-12-birthday-wrap",
+      "time": "2020-11-12T13:00:00+08:00",
+      "message": "2020年11月12日嘉成生日快樂-包裝禮物 🎁",
+      "image": "images/2020-11-12-3.jpg",
+      "url": "https://www.facebook.com/share/p/1DEhss9N7b/?mibextid=wwXIfr",
+      "feeling": "很開心",
+      "place": "高雄市"
     }
-
-    let raw;
-    try {
-      raw = await fetchJSON('assets/js/posts.json');
-    } catch(e1){
-      try {
-        raw = await fetchJSON('Bruce/assets/js/posts.json');
-      } catch(e2){
-        console.error(e1, e2);
-        listEl.innerHTML = '<p>❌ 讀取失敗：找不到 <code>assets/js/posts.json</code> 或 <code>Bruce/assets/js/posts.json</code>。</p>';
-        return;
-      }
-    }
-
-    // ① 部落格格式：[{ id,title,date,tags,html }]
-    if (Array.isArray(raw)) {
-      window.__posts = raw.slice().sort((a,b)=> (a.date<b.date?1:-1));
-    }
-    // ② Facebook 格式：{ items:[{ id,time,message,image,url,feeling,place }] }
-    else if (raw && Array.isArray(raw.items)) {
-      const converted = raw.items.map(p=>{
-        const date = (p.time||'').slice(0,10);
-        const title = (p.message||'').split('\n')[0].slice(0,30) || 'Facebook 貼文';
-        const tags = ['Facebook']
-          .concat(p.place ? [p.place] : [])
-          .concat(p.feeling ? [p.feeling] : []);
-        const timeText = p.time ? new Date(p.time).toLocaleString('zh-TW',{hour12:false}) : '';
-        const html =
-          (p.image ? `<p><img src="${p.image}" alt="" style="max-width:100%;border-radius:12px"/></p>` : '') +
-          `<p style="opacity:.85">時間：${timeText}${p.place ? '｜地點：'+p.place : ''}${p.feeling ? '｜心情：'+p.feeling : ''}</p>` +
-          `<p>${(p.message||'').replace(/\n/g,'<br>')}</p>` +
-          (p.url ? `<p><a class="btn" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看</a></p>` : '');
-        return { id:p.id, title, date, tags, html };
-      });
-      window.__posts = converted.sort((a,b)=> (a.date<b.date?1:-1));
-    }
-    else {
-      listEl.innerHTML = '<p>⚠️ posts.json 格式錯誤（需為陣列或 {items:[...]}）。</p>';
-      console.error('格式錯誤：', raw);
-      return;
-    }
-
-    renderFilters(window.__posts);
-    renderList(window.__posts);
-
-    function route(){
-      const id = location.hash.slice(1);
-      if(!id){ viewerEl.style.display='none'; return; }
-      const p = window.__posts.find(x=>x.id===id);
-      if(p) renderViewer(p);
-    }
-    route();
-    window.addEventListener('hashchange', route);
-
-    // 主題切換（保留）
-    const t = localStorage.getItem('theme'); if(t) document.documentElement.dataset.theme = t;
-    document.getElementById('themeToggle').addEventListener('click', ()=>{
-      const dark = document.documentElement.dataset.theme !== 'light';
-      document.documentElement.dataset.theme = dark ? 'light' : 'dark';
-      localStorage.setItem('theme', document.documentElement.dataset.theme);
-    });
-  }
-  document.addEventListener('DOMContentLoaded', boot);
-  </script>
-</body>
-</html>
+  ]
+}
