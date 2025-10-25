@@ -49,6 +49,7 @@
   }
   function tagBadge(t){ return `<span class="badge">${t}</span>` }
 
+  // === 列表渲染 ===
   function renderList(items){
     const list = document.getElementById('list');
     list.innerHTML = items.map(p => `
@@ -60,13 +61,15 @@
           ${(p.tags||[]).map(tagBadge).join(' ')}
         </div>
         <p style="margin:0 0 12px; opacity:.95">${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...</p>
-        <p>
+        <div style="display:flex;gap:8px;flex-wrap:wrap;">
+          ${p.fbURL ? `<a class="btn sm" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a>` : ''}
           <a class="btn" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a>
-        </p>
+        </div>
       </article>
     `).join('');
   }
 
+  // === 篩選標籤 ===
   function renderFilters(items){
     const set = new Set(); items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
     const all = Array.from(set).sort();
@@ -82,21 +85,24 @@
     }));
   }
 
+  // === 單篇顯示 ===
   function renderViewer(p){
     const v = document.getElementById('viewer');
     v.style.display = 'block';
     document.getElementById('pageTitle').textContent = p.title;
     document.title = `${p.title}｜我的網站`;
 
-    // 主內文：移除多餘的 FB/返回鈕
+    const fbButton = p.fbURL ? `<p><a class="btn sm" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a></p>` : '';
+
     v.innerHTML = `
-      <p><a class="btn" href="posts.html">← 返回列表</a></p>
+      <p><a class="btn sm" href="posts.html">← 返回列表</a></p>
       <h2 style="margin:0 0 12px">${p.title}</h2>
       <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
         <small style="opacity:.8">${formatDate(p.date)}</small>
         <span>•</span>
         ${(p.tags||[]).map(tagBadge).join(' ')}
       </div>
+      ${fbButton}
       <div>${p.html||''}</div>
     `;
     window.scrollTo({top:0, behavior:'smooth'});
@@ -115,6 +121,7 @@
     document.title = '文章｜我的網站';
   }
 
+  // === 啟動 ===
   async function boot(){
     const listEl = document.getElementById('list');
     listEl.innerHTML = '載入中…';
@@ -131,9 +138,8 @@
       catch(e2){ listEl.innerHTML = '<p>❌ 讀取失敗：請確認 posts.json 路徑。</p>'; console.error(e1,e2); return; }
     }
 
-    if (Array.isArray(raw)) {
-      window.__posts = raw.slice().map(p=>({ ...p, fbURL: p.fbURL || null }));
-    }
+    // 通用轉換格式
+    if (Array.isArray(raw)) window.__posts = raw;
     else if (raw && Array.isArray(raw.items)) {
       window.__posts = raw.items.map(p=>{
         const date = (p.time||'').slice(0,10);
@@ -149,10 +155,6 @@
           `<div>${msgHTML}</div>`;
         return { id:p.id, title, date, tags, html, fbURL: p.url || null };
       });
-    }
-    else {
-      listEl.innerHTML = '<p>⚠️ posts.json 格式錯誤。</p>';
-      return;
     }
 
     window.__posts.sort((a,b)=> (a.date<b.date?1:-1));
