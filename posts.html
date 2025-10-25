@@ -8,11 +8,14 @@
   <link rel="stylesheet" href="assets/css/style.css"/>
   <meta name="description" content="我的文章與專案紀錄"/>
   <style>
-    .all-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-    .all-list .item{display:flex;justify-content:space-between;gap:8px;align-items:center;padding:10px 12px;border:1px solid #334155;border-radius:10px}
-    .all-list .left{min-width:0}
-    .all-list .title{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-    .all-list .meta{opacity:.75;font-size:.85rem}
+    /* 工具列 */
+    .toolbar{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+    .toolbar .fld{display:flex;align-items:center;gap:6px}
+    .toolbar input[type="text"]{min-width:260px;padding:8px 10px;border:1px solid #334155;border-radius:8px;background:transparent;color:inherit}
+    .toolbar select,.toolbar input[type="date"]{padding:8px 10px;border:1px solid #334155;border-radius:8px;background:transparent;color:inherit}
+    .toolbar .help{opacity:.7;font-size:.85rem}
+
+    /* 卡片/按鈕（承襲你的風格） */
     .btn.sm{padding:4px 10px;font-size:.85rem;border-radius:6px;border:1px solid #64748b;text-decoration:none}
   </style>
 </head>
@@ -36,7 +39,38 @@
 
   <main class="container section">
     <h1 id="pageTitle" style="margin:0 0 12px">文章</h1>
-    <div id="filters" style="display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 20px"></div>
+
+    <!-- 搜尋 + 進階篩選工具列 -->
+    <div id="toolbar" class="toolbar">
+      <div class="fld">
+        <input id="q" type="text" placeholder="搜尋標題／內文／地點／心情…（即時篩選）"/>
+      </div>
+      <div class="fld">
+        <label for="place">地點</label>
+        <select id="place"><option value="">全部</option></select>
+      </div>
+      <div class="fld">
+        <label for="feeling">心情</label>
+        <select id="feeling"><option value="">全部</option></select>
+      </div>
+      <div class="fld">
+        <label for="from">從</label>
+        <input id="from" type="date"/>
+      </div>
+      <div class="fld">
+        <label for="to">到</label>
+        <input id="to" type="date"/>
+      </div>
+      <div class="fld">
+        <label for="sort">排序</label>
+        <select id="sort">
+          <option value="desc">新 → 舊</option>
+          <option value="asc">舊 → 新</option>
+        </select>
+      </div>
+      <span class="help">提示：輸入關鍵字或調整條件，列表會即時更新。</span>
+    </div>
+
     <div id="list" class="grid"></div>
     <hr class="sep"/>
     <article id="viewer" class="card" style="display:none"></article>
@@ -44,27 +78,30 @@
 
   <script>
   // ===== 小工具 =====
-  function formatDate(s){
+  const strip = (s='') => s.toString().replace(/<[^>]+>/g,'');
+  const fmtDate = s => {
     const d = new Date(s);
-    return isNaN(d) ? s : d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
-  }
-  function tagBadge(t){ return `<span class="badge">${t}</span>` }
+    return isNaN(d) ? s : d.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});
+  };
+  const badge = t => `<span class="badge">${t}</span>`;
+  const debounce = (fn,ms=200)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
 
   // ===== 列表 =====
   function renderList(items){
     const list = document.getElementById('list');
-    list.innerHTML = items.map(p => {
-      const title = p.title || `${formatDate(p.date)} - ${p.place || ''}`;
-      const plain = (p.message || p.html || '').toString().replace(/<[^>]+>/g, '');
-      const preview = plain.slice(0, 110) + (plain.length > 110 ? '…' : '');
+    if(!items.length){ list.innerHTML = '<p style="opacity:.8">找不到符合條件的文章。</p>'; return; }
+    list.innerHTML = items.map(p=>{
+      const title = p.title || `${fmtDate(p.date)} - ${p.place || ''}`;
+      const previewSrc = strip(p.html || p.message || '').slice(0,110);
+      const preview = previewSrc + (previewSrc.length>=110?'…':'');
       return `
         <article class="card">
           <h3 style="margin:0">${title}</h3>
           <div style="display:flex; gap:8px; align-items:center; margin:6px 0 10px">
-            <small style="opacity:.8">${formatDate(p.date)}</small>
+            <small style="opacity:.8">${fmtDate(p.date)}</small>
             <span>•</span>
-            ${p.place ? `<span class="badge">${p.place}</span>` : ''}
-            ${p.feeling ? `<span class="badge">${p.feeling}</span>` : ''}
+            ${p.place ? badge(p.place) : ''}
+            ${p.feeling ? badge(p.feeling) : ''}
           </div>
           <p style="margin:0 0 12px; opacity:.95">${preview}</p>
           <p><a class="btn" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a></p>
@@ -73,59 +110,106 @@
     }).join('');
   }
 
-  // ===== 單篇詳閱 =====
+  // ===== 內頁 =====
   function renderViewer(p){
     const v = document.getElementById('viewer');
     v.style.display = 'block';
-    const title = p.title || `${formatDate(p.date)} - ${p.place || ''}`;
+    const title = p.title || `${fmtDate(p.date)} - ${p.place || ''}`;
     document.getElementById('pageTitle').textContent = title;
     document.title = `${title}｜我的網站`;
 
-    const fbButton = p.fbURL ? `<p><a class="btn sm" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a></p>` : '';
+    const fbBtn = p.fbURL ? `<p><a class="btn sm" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a></p>` : '';
 
     v.innerHTML = `
       <p><a class="btn sm" href="posts.html">← 返回列表</a></p>
       <h2 style="margin:0 0 12px">${title}</h2>
       <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
-        <small style="opacity:.8">${formatDate(p.date)}</small>
+        <small style="opacity:.8">${fmtDate(p.date)}</small>
         <span>•</span>
-        ${p.place ? `<span class="badge">${p.place}</span>` : ''}
-        ${p.feeling ? `<span class="badge">${p.feeling}</span>` : ''}
+        ${p.place ? badge(p.place) : ''}
+        ${p.feeling ? badge(p.feeling) : ''}
       </div>
-      ${fbButton}
+      ${fbBtn}
       <div>${p.html || ''}</div>
     `;
     window.scrollTo({top:0, behavior:'smooth'});
   }
 
-  // ===== 篩選 =====
-  function renderFilters(items){
-    const set = new Set(); items.forEach(p => (p.tags || []).forEach(t => set.add(t)));
-    const all = Array.from(set).sort();
-    const filters = document.getElementById('filters');
-    filters.innerHTML = ['全部', ...all].map(t => `<a class="btn" href="#" data-filter="${t}">${t}</a>`).join('');
-    filters.querySelectorAll('a').forEach(a => a.addEventListener('click', e => {
-      e.preventDefault();
-      const f = a.dataset.filter;
-      const filtered = f === '全部' ? window.__posts : window.__posts.filter(p => (p.tags || []).includes(f));
-      renderList(filtered);
-      history.replaceState(null, '', 'posts.html');
-      showListMode();
-    }));
-  }
-
   // ===== 模式切換 =====
   function showViewMode(){
-    document.getElementById('filters').style.display = 'none';
+    document.getElementById('toolbar').style.display = 'none';
     document.getElementById('list').style.display = 'none';
     document.getElementById('viewer').style.display = 'block';
   }
   function showListMode(){
-    document.getElementById('filters').style.display = 'flex';
+    document.getElementById('toolbar').style.display = 'flex';
     document.getElementById('list').style.display = 'grid';
     document.getElementById('viewer').style.display = 'none';
     document.getElementById('pageTitle').textContent = '文章';
     document.title = '文章｜我的網站';
+  }
+
+  // ===== 全域資料與狀態 =====
+  let ALL = [];            // 原始資料
+  let state = { q:'', place:'', feeling:'', from:'', to:'', sort:'desc' };
+
+  function applyFilters(){
+    // 來源資料
+    let arr = ALL.slice();
+
+    // 文字搜尋
+    if(state.q){
+      const q = state.q.toLowerCase();
+      arr = arr.filter(p=>{
+        const hay = [
+          p.title || '',
+          strip(p.html || p.message || ''),
+          p.place || '',
+          p.feeling || ''
+        ].join(' ').toLowerCase();
+        return hay.includes(q);
+      });
+    }
+
+    // 地點 / 心情
+    if(state.place)  arr = arr.filter(p => (p.place||'')  === state.place);
+    if(state.feeling)arr = arr.filter(p => (p.feeling||'')=== state.feeling);
+
+    // 日期區間（含端點）
+    if(state.from){
+      arr = arr.filter(p => (p.date||'') >= state.from);
+    }
+    if(state.to){
+      arr = arr.filter(p => (p.date||'') <= state.to);
+    }
+
+    // 排序
+    arr.sort((a,b)=> state.sort==='desc' ? (a.date<b.date?1:-1) : (a.date>b.date?1:-1));
+
+    renderList(arr);
+  }
+
+  // 建立工具列選單
+  function buildToolbarOptions(){
+    const places   = [...new Set(ALL.map(p=>p.place).filter(Boolean))].sort();
+    const feelings = [...new Set(ALL.map(p=>p.feeling).filter(Boolean))].sort();
+    const placeSel   = document.getElementById('place');
+    const feelingSel = document.getElementById('feeling');
+    placeSel.innerHTML   = `<option value="">全部</option>${places.map(v=>`<option>${v}</option>`).join('')}`;
+    feelingSel.innerHTML = `<option value="">全部</option>${feelings.map(v=>`<option>${v}</option>`).join('')}`;
+  }
+
+  // 綁定事件
+  function bindToolbar(){
+    const $ = id => document.getElementById(id);
+    const on = (el,ev,fn)=> el.addEventListener(ev,fn);
+
+    on($('q')      ,'input', debounce(e=>{ state.q = e.target.value.trim(); applyFilters(); },200));
+    on($('place')  ,'change', e=>{ state.place   = e.target.value; applyFilters(); });
+    on($('feeling'),'change', e=>{ state.feeling = e.target.value; applyFilters(); });
+    on($('from')   ,'change', e=>{ state.from    = e.target.value; applyFilters(); });
+    on($('to')     ,'change', e=>{ state.to      = e.target.value; applyFilters(); });
+    on($('sort')   ,'change', e=>{ state.sort    = e.target.value; applyFilters(); });
   }
 
   // ===== 啟動 =====
@@ -149,22 +233,34 @@
 
     // 格式轉換
     if (Array.isArray(raw)) {
-      window.__posts = raw.slice();
+      // 你自訂的 posts.json（建議字段：id/title/date/place/feeling/html/fbURL）
+      ALL = raw.slice().map(p=>({
+        id:String(p.id),
+        title:p.title||'',
+        date:p.date||'',
+        place:p.place||'',
+        feeling:p.feeling||'',
+        html:p.html||'',
+        message:p.message||'',
+        fbURL:p.fbURL||p.url||''
+      }));
     } else if (raw && Array.isArray(raw.items)) {
-      window.__posts = raw.items.map(p => {
-        const date = (p.time || '').slice(0, 10);
+      // 兼容 {items:[...]}（Facebook 匯入格式）
+      ALL = raw.items.map(p=>{
+        const date = (p.time||'').slice(0,10);
         const html =
           (p.image ? `<p><img src="${p.image}" alt="" style="max-width:100%;border-radius:12px"/></p>` : '') +
           `<p style="opacity:.85">時間：${new Date(p.time).toLocaleString('zh-TW',{hour12:false})}${p.place ? '｜地點：'+p.place : ''}${p.feeling ? '｜心情：'+p.feeling : ''}</p>` +
-          `<div>${(p.message || '').replace(/\n/g, '<br>')}</div>`;
+          `<div>${(p.message || '').replace(/\n/g,'<br>')}</div>`;
         return {
-          id: p.id,
-          title: p.title || `${formatDate(date)} - ${p.place || ''}`,
+          id:String(p.id),
+          title: p.title || `${fmtDate(date)} - ${p.place||''}`,
           date,
+          place: p.place||'',
+          feeling: p.feeling||'',
           html,
-          place: p.place || '',
-          feeling: p.feeling || '',
-          fbURL: p.url || ''
+          message:p.message||'',
+          fbURL: p.url||''
         };
       });
     } else {
@@ -172,18 +268,22 @@
       return;
     }
 
-    // 排序（新到舊）
-    window.__posts.sort((a,b)=> (a.date<b.date?1:-1));
+    // 預設排序：新→舊
+    ALL.sort((a,b)=> (a.date<b.date?1:-1));
 
-    renderFilters(window.__posts);
-    renderList(window.__posts);
+    // 工具列
+    buildToolbarOptions();
+    bindToolbar();
 
-    // 路由
+    // 初次渲染
+    applyFilters();
+
+    // 路由（內頁）
     function route(){
       const rawHash = location.hash.slice(1);
       if(!rawHash){ showListMode(); return; }
       const id = decodeURIComponent(rawHash);
-      const p = window.__posts.find(x=> String(x.id) === id);
+      const p = ALL.find(x=> String(x.id) === id);
       if(p){ showViewMode(); renderViewer(p); }
       else { showListMode(); }
     }
@@ -191,7 +291,7 @@
     window.addEventListener('hashchange', route);
 
     // 主題切換
-    const t = localStorage.getItem('theme'); 
+    const t = localStorage.getItem('theme');
     if(t) document.documentElement.dataset.theme = t;
     document.getElementById('themeToggle').addEventListener('click', ()=>{
       const dark = document.documentElement.dataset.theme !== 'light';
