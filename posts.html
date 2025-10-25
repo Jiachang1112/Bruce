@@ -35,7 +35,7 @@
   </nav>
 
   <main class="container section">
-    <h1 style="margin:0 0 12px">文章</h1>
+    <h1 id="pageTitle" style="margin:0 0 12px">文章</h1>
     <div id="filters" style="display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 20px"></div>
     <div id="list" class="grid"></div>
     <hr class="sep"/>
@@ -43,14 +43,14 @@
   </main>
 
   <script>
-  // -------- 小工具 --------
+  // 工具
   function formatDate(s){
     const d = new Date(s + 'T00:00:00');
     return isNaN(d) ? s : d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
   }
   function tagBadge(t){ return `<span class="badge">${t}</span>` }
 
-  // -------- 列表 --------
+  // 列表
   function renderList(items){
     const list = document.getElementById('list');
     list.innerHTML = items.map(p => `
@@ -63,14 +63,14 @@
         </div>
         <p style="margin:0 0 12px; opacity:.95">${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...</p>
         <p>
-          <a class="btn" href="posts.html#${p.id}">閱讀全文</a>
+          <a class="btn" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a>
           ${p.fbURL ? ` <a class="btn" href="${p.fbURL}" target="_blank" rel="noopener">Facebook 連結 ↗</a>` : ''}
         </p>
       </article>
     `).join('');
   }
 
-  // -------- 篩選 --------
+  // 篩選
   function renderFilters(items){
     const set = new Set(); items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
     const all = Array.from(set).sort();
@@ -82,29 +82,19 @@
       const filtered = f==='全部' ? window.__posts : window.__posts.filter(p=>(p.tags||[]).includes(f));
       renderList(filtered);
       history.replaceState(null, '', 'posts.html');
-      document.getElementById('viewer').style.display = 'none';
+      showListMode(); // 回列表模式
     }));
   }
 
-  // -------- 詳閱（顯示 message 全文 + FB 連結 + 所有文章清單）--------
+  // 詳閱
   function renderViewer(p){
     const v = document.getElementById('viewer');
     v.style.display = 'block';
-
-    const allHTML = window.__posts.map(x => `
-      <div class="item">
-        <div class="left">
-          <div class="title">${x.title}</div>
-          <div class="meta">${formatDate(x.date)}　${(x.tags||[]).slice(0,3).join(' / ')}</div>
-        </div>
-        <div class="right">
-          <a class="btn sm" href="posts.html#${x.id}">閱讀</a>
-          ${x.fbURL ? ` <a class="btn sm" href="${x.fbURL}" target="_blank" rel="noopener" title="在 Facebook 查看">FB ↗</a>` : ''}
-        </div>
-      </div>
-    `).join('');
+    document.getElementById('pageTitle').textContent = p.title;
+    document.title = `${p.title}｜我的網站`;
 
     v.innerHTML = `
+      <p><a class="btn" href="posts.html">← 返回列表</a></p>
       <h2 style="margin:0 0 12px">${p.title}</h2>
       <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
         <small style="opacity:.8">${formatDate(p.date)}</small>
@@ -113,19 +103,28 @@
       </div>
       ${p.fbURL ? `<p><a class="btn" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a></p>` : ''}
       <div>${p.html||''}</div>
-
-      <h3 style="margin:22px 0 10px">所有文章</h3>
-      <div class="all-list">${allHTML}</div>
-
       <p style="margin-top:16px"><a class="btn" href="posts.html">← 返回列表</a></p>
     `;
     window.scrollTo({top:0, behavior:'smooth'});
   }
 
-  // -------- 主程式：相容兩種 posts.json --------
+  // 切換模式（像新聞站：詳閱只顯示單篇）
+  function showViewMode(){
+    document.getElementById('filters').style.display = 'none';
+    document.getElementById('list').style.display = 'none';
+    document.getElementById('viewer').style.display = 'block';
+  }
+  function showListMode(){
+    document.getElementById('filters').style.display = 'flex';
+    document.getElementById('list').style.display = 'grid';
+    document.getElementById('viewer').style.display = 'none';
+    document.getElementById('pageTitle').textContent = '文章';
+    document.title = '文章｜我的網站';
+  }
+
+  // 主程式（相容兩種 posts.json）
   async function boot(){
     const listEl = document.getElementById('list');
-    const viewerEl = document.getElementById('viewer');
     listEl.innerHTML = '載入中…';
 
     async function fetchJSON(path){
@@ -135,27 +134,21 @@
     }
 
     let raw;
-    try {
-      raw = await fetchJSON('assets/js/posts.json');
-    } catch(e1){
-      try {
-        raw = await fetchJSON('Bruce/assets/js/posts.json');
-      } catch(e2){
-        console.error(e1, e2);
-        listEl.innerHTML = '<p>❌ 讀取失敗：找不到 <code>assets/js/posts.json</code> 或 <code>Bruce/assets/js/posts.json</code>。</p>';
-        return;
-      }
+    try { raw = await fetchJSON('assets/js/posts.json'); }
+    catch(e1){
+      try { raw = await fetchJSON('Bruce/assets/js/posts.json'); }
+      catch(e2){ listEl.innerHTML = '<p>❌ 讀取失敗：請確認 posts.json 路徑。</p>'; console.error(e1,e2); return; }
     }
 
-    // ① 部落格格式：[{ id,title,date,tags,html, fbURL? }]
+    // ① 部落格陣列
     if (Array.isArray(raw)) {
-      window.__posts = raw.slice().map(p=>({ ...p, fbURL: p.fbURL || null })).sort((a,b)=> (a.date<b.date?1:-1));
+      window.__posts = raw.slice().map(p=>({ ...p, fbURL: p.fbURL || null }));
     }
-    // ② Facebook 格式：{ items:[{ id,time,message,image?,url?,feeling?,place? }] }
+    // ② Facebook 物件
     else if (raw && Array.isArray(raw.items)) {
-      const converted = raw.items.map(p=>{
+      window.__posts = raw.items.map(p=>{
         const date = (p.time||'').slice(0,10);
-        const title = (p.message||'').split('\n')[0].slice(0,30) || 'Facebook 貼文';
+        const title = (p.message||'').split('\n')[0].slice(0,50) || 'Facebook 貼文';
         const tags = ['Facebook']
           .concat(p.place ? [p.place] : [])
           .concat(p.feeling ? [p.feeling] : []);
@@ -168,7 +161,6 @@
           (p.url ? `<p><a class="btn" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a></p>` : '');
         return { id:p.id, title, date, tags, html, fbURL: p.url || null };
       });
-      window.__posts = converted.sort((a,b)=> (a.date<b.date?1:-1));
     }
     else {
       listEl.innerHTML = '<p>⚠️ posts.json 格式錯誤（需為陣列或 {items:[...]}）。</p>';
@@ -176,14 +168,19 @@
       return;
     }
 
+    // 排序、渲染列表
+    window.__posts.sort((a,b)=> (a.date<b.date?1:-1));
     renderFilters(window.__posts);
     renderList(window.__posts);
 
+    // 路由（支援中文/特殊字 id）
     function route(){
-      const id = location.hash.slice(1);
-      if(!id){ viewerEl.style.display='none'; return; }
-      const p = window.__posts.find(x=>x.id===id);
-      if(p) renderViewer(p);
+      const rawHash = location.hash.slice(1);
+      if(!rawHash){ showListMode(); return; }
+      const id = decodeURIComponent(rawHash);
+      const p = window.__posts.find(x=> String(x.id) === id);
+      if(p){ showViewMode(); renderViewer(p); }
+      else { showListMode(); } // 找不到就回列表
     }
     route();
     window.addEventListener('hashchange', route);
@@ -196,6 +193,7 @@
       localStorage.setItem('theme', document.documentElement.dataset.theme);
     });
   }
+
   document.addEventListener('DOMContentLoaded', boot);
   </script>
 </body>
