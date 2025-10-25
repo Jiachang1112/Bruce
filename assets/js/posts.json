@@ -1,58 +1,67 @@
 {
   "items": [
     {
-      "id": "2020-11-12-birthday-album",
-      "time": "2020-11-12T12:00:00+08:00",
-      "message": "2020年11月12日（嘉成）生日快樂 🎂",
-      "image": "images/2020-11-12-1.jpg",
-      "url": "https://www.facebook.com/share/v/1F3k6frcT2/?mibextid=wwXIfr",
-      "feeling": "開心",
-      "place": "高雄市"
-    },
-    {
-      "id": "2020-11-08-ride-2-96km",
-      "time": "2020-11-08T09:00:00+08:00",
-      "message": "今天從家裡騎腳踏車去阿嬤家共 2.96km 🚴‍♂️",
-      "image": "images/2020-11-08-1.jpg",
-      "url": "https://www.facebook.com/share/p/16KfYhyCHm/",
-      "feeling": "覺得開心",
-      "place": "高雄市"
-    },
-    {
-      "id": "2020-11-08-ride-2-96km",
-      "time": "2020-11-08T09:00:00+08:00",
-      "message": "今天從家裡騎腳踏車去阿嬤家共 2.96km 🚴‍♂️",
-      "image": "images/2020-11-08-1.jpg",
-      "url": "https://www.facebook.com/share/p/16KfYhyCHm/",
-      "feeling": "覺得開心",
-      "place": "高雄市"
-    },
-    {
-      "id": "2020-11-01-dad-bike",
-      "time": "2020-11-08T11:00:00+08:00",
-      "message": "2020年11月7日爸爸謝謝您買（icash2.0）和（悠遊卡）給我",
-      "image": "images/2020-10-27-1.jpg",
-      "url": "https://www.facebook.com/share/p/17FnhwMcjc/?mibextid=wwXIfr",
-      "feeling": "覺得若有所思",
-      "place": "高雄市"
-    },
-    {
       "id": "2020-10-31-watermelon-milk",
       "time": "2020-10-31T14:30:00+08:00",
       "message": "好熱～來杯（木瓜牛奶）🥤",
       "image": "images/2020-10-31-1.jpg",
-      "url": "https://www.facebook.com/share/p/1Anvub6Zpa/?mibextid=wwXIfr",
+      "url": "https://www.facebook.com/share/p/19zKyJ69rR/",
       "feeling": "覺得放鬆",
+      "place": "高雄市"
+    },
+    {
+      "id": "2020-10-27-desk-and-bicycle",
+      "time": "2020-11-01T12:00:00+08:00",
+      "message": "2020年10月27日爸爸🧑‍🦱 謝謝您買書桌 and 腳踏車🚴 給我\nOctober 27, 2020 Dad🧑‍🦱 Thank you for buying a desk and bicycle🚴 give me",
+      "image": "images/2020-10-27-1.jpg",
+      "url": "https://www.facebook.com/share/p/1AK2xG5WZA/",
+      "feeling": "覺得正面積極",
+      "place": "路竹區"
+    },
+    {
+      "id": "2020-11-07-icash-ezcard",
+      "time": "2020-11-08T12:00:00+08:00",
+      "message": "2020年11月7日爸爸謝謝您買（icash2.0）和（悠遊卡）給我",
+      "image": "images/2020-11-07-1.jpg",
+      "url": "https://www.facebook.com/share/p/17Ubab4YJe/",
+      "feeling": "覺得有所思",
+      "place": "高雄市"
+    },
+    {
+      "id": "2020-11-08-ride-2_96km",
+      "time": "2020-11-08T09:00:00+08:00",
+      "message": "今天從家裡騎腳踏車去阿嬤家共 2.96km",
+      "image": "images/2020-11-08-1.jpg",
+      "url": "https://www.facebook.com/share/p/16KfYhyCHm/",
+      "feeling": "覺得開心",
+      "place": "高雄市"
+    },
+    {
+      "id": "2020-11-12-birthday-album",
+      "time": "2020-11-12T12:00:00+08:00",
+      "message": "2020年11月12日（嘉成）生日快樂 🎂（相簿 14 張照片 + 1 段影片）",
+      "image": "images/2020-11-12-1.jpg",
+      "url": "https://www.facebook.com/share/p/1AJMx5QHzC/",
+      "feeling": "開心",
       "place": "高雄市"
     },
     {
       "id": "2020-11-12-birthday-wrap",
       "time": "2020-11-12T13:00:00+08:00",
-      "message": "2020年11月12日嘉成生日快樂-包裝禮物 🎁",
+      "message": "2020年11月12日嘉成生日快樂－包裝禮物 🎁",
       "image": "images/2020-11-12-3.jpg",
-      "url": "https://www.facebook.com/share/p/1DEhss9N7b/?mibextid=wwXIfr",
+      "url": "https://www.facebook.com/share/v/1HTeksGKHK/",
       "feeling": "很開心",
       "place": "高雄市"
+    },
+    {
+      "id": "2020-11-22-nomura-bbq",
+      "time": "2020-11-22T18:00:00+08:00",
+      "message": "2020/11/22 今天來到了（野村）",
+      "image": "images/2020-11-22-1.jpg",
+      "url": "https://www.facebook.com/share/p/17RRCYdbkP/",
+      "feeling": "覺得心情放鬆",
+      "place": "台南市（野村日式燒肉）"
     }
   ]
 }
