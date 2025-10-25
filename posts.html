@@ -50,9 +50,19 @@
   function tagBadge(t){ return `<span class="badge">${t}</span>` }
 
   // === 列表渲染 ===
-  function renderList(items){
-    const list = document.getElementById('list');
-    list.innerHTML = items.map(p => `
+function renderList(items){
+  const list = document.getElementById('list');
+  list.innerHTML = items.map((p, i) => {
+    const readBtn = `<a class="btn" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a>`;
+    const fbBtn   = p.fbURL ? `<a class="btn sm" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a>` : '';
+
+    // 只有第 2 張卡片（index 1）交換順序；其餘保持 FB → 閱讀
+    const btnRow = `
+      <div style="display:flex;gap:8px;flex-wrap:wrap;">
+        ${i === 1 ? `${readBtn}${fbBtn ? ' ' + fbBtn : ''}` : `${fbBtn ? fbBtn + ' ' : ''}${readBtn}`}
+      </div>`;
+
+    return `
       <article class="card">
         <h3 style="margin:0">${p.title}</h3>
         <div style="display:flex; gap:8px; align-items:center; margin:6px 0 10px">
@@ -60,14 +70,14 @@
           <span>•</span>
           ${(p.tags||[]).map(tagBadge).join(' ')}
         </div>
-        <p style="margin:0 0 12px; opacity:.95">${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...</p>
-        <div style="display:flex;gap:8px;flex-wrap:wrap;">
-          ${p.fbURL ? `<a class="btn sm" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a>` : ''}
-          <a class="btn" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a>
-        </div>
+        <p style="margin:0 0 12px; opacity:.95">
+          ${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...
+        </p>
+        ${btnRow}
       </article>
-    `).join('');
-  }
+    `;
+  }).join('');
+}
 
   // === 篩選標籤 ===
   function renderFilters(items){
