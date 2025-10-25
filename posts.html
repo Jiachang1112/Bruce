@@ -43,7 +43,7 @@
   </main>
 
   <script>
-  // -------- 工具 --------
+  // -------- 小工具 --------
   function formatDate(s){
     const d = new Date(s + 'T00:00:00');
     return isNaN(d) ? s : d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
@@ -86,12 +86,11 @@
     }));
   }
 
-  // -------- 詳閱（顯示 FB 連結 + 所有文章清單）--------
+  // -------- 詳閱（顯示 message 全文 + FB 連結 + 所有文章清單）--------
   function renderViewer(p){
     const v = document.getElementById('viewer');
     v.style.display = 'block';
 
-    // 底下「所有文章」清單
     const allHTML = window.__posts.map(x => `
       <div class="item">
         <div class="left">
@@ -152,7 +151,7 @@
     if (Array.isArray(raw)) {
       window.__posts = raw.slice().map(p=>({ ...p, fbURL: p.fbURL || null })).sort((a,b)=> (a.date<b.date?1:-1));
     }
-    // ② Facebook 格式：{ items:[{ id,time,message,image,url,feeling,place }] }
+    // ② Facebook 格式：{ items:[{ id,time,message,image?,url?,feeling?,place? }] }
     else if (raw && Array.isArray(raw.items)) {
       const converted = raw.items.map(p=>{
         const date = (p.time||'').slice(0,10);
@@ -161,10 +160,11 @@
           .concat(p.place ? [p.place] : [])
           .concat(p.feeling ? [p.feeling] : []);
         const timeText = p.time ? new Date(p.time).toLocaleString('zh-TW',{hour12:false}) : '';
+        const msgHTML = (p.message||'').replace(/\n/g,'<br>');
         const html =
           (p.image ? `<p><img src="${p.image}" alt="" style="max-width:100%;border-radius:12px"/></p>` : '') +
           `<p style="opacity:.85">時間：${timeText}${p.place ? '｜地點：'+p.place : ''}${p.feeling ? '｜心情：'+p.feeling : ''}</p>` +
-          `<p>${(p.message||'').replace(/\n/g,'<br>')}</p>` +
+          `<div>${msgHTML}</div>` +
           (p.url ? `<p><a class="btn" href="${p.url}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a></p>` : '');
         return { id:p.id, title, date, tags, html, fbURL: p.url || null };
       });
@@ -188,7 +188,7 @@
     route();
     window.addEventListener('hashchange', route);
 
-    // 主題切換（保留）
+    // 主題切換
     const t = localStorage.getItem('theme'); if(t) document.documentElement.dataset.theme = t;
     document.getElementById('themeToggle').addEventListener('click', ()=>{
       const dark = document.documentElement.dataset.theme !== 'light';
