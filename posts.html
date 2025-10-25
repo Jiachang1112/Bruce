@@ -43,26 +43,17 @@
   </main>
 
   <script>
+  // 小工具
   function formatDate(s){
     const d = new Date(s + 'T00:00:00');
     return isNaN(d) ? s : d.toLocaleDateString('zh-TW', {year:'numeric', month:'2-digit', day:'2-digit'});
   }
   function tagBadge(t){ return `<span class="badge">${t}</span>` }
 
-  // === 列表渲染 ===
-function renderList(items){
-  const list = document.getElementById('list');
-  list.innerHTML = items.map((p, i) => {
-    const readBtn = `<a class="btn" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a>`;
-    const fbBtn   = p.fbURL ? `<a class="btn sm" href="${p.fbURL}" target="_blank" rel="noopener">在 Facebook 查看 ↗</a>` : '';
-
-    // 只有第 2 張卡片（index 1）交換順序；其餘保持 FB → 閱讀
-    const btnRow = `
-      <div style="display:flex;gap:8px;flex-wrap:wrap;">
-        ${i === 1 ? `${readBtn}${fbBtn ? ' ' + fbBtn : ''}` : `${fbBtn ? fbBtn + ' ' : ''}${readBtn}`}
-      </div>`;
-
-    return `
+  // 列表（只保留「閱讀全文」）
+  function renderList(items){
+    const list = document.getElementById('list');
+    list.innerHTML = items.map(p => `
       <article class="card">
         <h3 style="margin:0">${p.title}</h3>
         <div style="display:flex; gap:8px; align-items:center; margin:6px 0 10px">
@@ -70,16 +61,13 @@ function renderList(items){
           <span>•</span>
           ${(p.tags||[]).map(tagBadge).join(' ')}
         </div>
-        <p style="margin:0 0 12px; opacity:.95">
-          ${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...
-        </p>
-        ${btnRow}
+        <p style="margin:0 0 12px; opacity:.95">${(p.html||'').replace(/<[^>]+>/g,'').slice(0,110)}...</p>
+        <p><a class="btn" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a></p>
       </article>
-    `;
-  }).join('');
-}
+    `).join('');
+  }
 
-  // === 篩選標籤 ===
+  // 篩選
   function renderFilters(items){
     const set = new Set(); items.forEach(p => (p.tags||[]).forEach(t=>set.add(t)));
     const all = Array.from(set).sort();
@@ -95,7 +83,7 @@ function renderList(items){
     }));
   }
 
-  // === 單篇顯示 ===
+  // 單篇詳閱（顯示 1 顆 FB 鈕）
   function renderViewer(p){
     const v = document.getElementById('viewer');
     v.style.display = 'block';
@@ -118,6 +106,7 @@ function renderList(items){
     window.scrollTo({top:0, behavior:'smooth'});
   }
 
+  // 模式切換
   function showViewMode(){
     document.getElementById('filters').style.display = 'none';
     document.getElementById('list').style.display = 'none';
@@ -131,16 +120,18 @@ function renderList(items){
     document.title = '文章｜我的網站';
   }
 
-  // === 啟動 ===
+  // 啟動
   async function boot(){
     const listEl = document.getElementById('list');
     listEl.innerHTML = '載入中…';
+
     async function fetchJSON(path){
       const res = await fetch(path + '?v=' + Date.now(), { cache:'no-store' });
       if (!res.ok) throw new Error('HTTP ' + res.status + ' @ ' + path);
       return res.json();
     }
 
+    // 讀取 posts.json（先 assets/js，再 Bruce/assets/js）
     let raw;
     try { raw = await fetchJSON('assets/js/posts.json'); }
     catch(e1){
@@ -148,9 +139,10 @@ function renderList(items){
       catch(e2){ listEl.innerHTML = '<p>❌ 讀取失敗：請確認 posts.json 路徑。</p>'; console.error(e1,e2); return; }
     }
 
-    // 通用轉換格式
-    if (Array.isArray(raw)) window.__posts = raw;
-    else if (raw && Array.isArray(raw.items)) {
+    // 轉為統一格式
+    if (Array.isArray(raw)) {
+      window.__posts = raw.slice();
+    } else if (raw && Array.isArray(raw.items)) {
       window.__posts = raw.items.map(p=>{
         const date = (p.time||'').slice(0,10);
         const title = (p.message||'').split('\n')[0].slice(0,50) || 'Facebook 貼文';
@@ -165,12 +157,18 @@ function renderList(items){
           `<div>${msgHTML}</div>`;
         return { id:p.id, title, date, tags, html, fbURL: p.url || null };
       });
+    } else {
+      listEl.innerHTML = '<p>⚠️ posts.json 格式錯誤（需為陣列或 {items:[...]}）。</p>';
+      return;
     }
 
+    // 排序：新到舊（要舊到新可改成 a.date>b.date?1:-1）
     window.__posts.sort((a,b)=> (a.date<b.date?1:-1));
+
     renderFilters(window.__posts);
     renderList(window.__posts);
 
+    // 路由（支援中文/特殊字 id）
     function route(){
       const rawHash = location.hash.slice(1);
       if(!rawHash){ showListMode(); return; }
@@ -182,6 +180,7 @@ function renderList(items){
     route();
     window.addEventListener('hashchange', route);
 
+    // 主題切換
     const t = localStorage.getItem('theme'); if(t) document.documentElement.dataset.theme = t;
     document.getElementById('themeToggle').addEventListener('click', ()=>{
       const dark = document.documentElement.dataset.theme !== 'light';
@@ -189,6 +188,7 @@ function renderList(items){
       localStorage.setItem('theme', document.documentElement.dataset.theme);
     });
   }
+
   document.addEventListener('DOMContentLoaded', boot);
   </script>
 </body>
