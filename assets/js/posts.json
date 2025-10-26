@@ -89,6 +89,26 @@
       "url": "https://www.facebook.com/share/p/17mC5pqedR/",
       "feeling": "覺得開心",
       "place": "高雄市"
+    },
+    {
+      "id": "2020-12-20-tainan-christmas",
+      "title": "2020年12月20日 - 台南市",
+      "time": "2020-12-20T19:00:00+08:00",
+      "message": "好冷～來慶祝（聖誕節）",
+      "image": "images/2020-12-20-tainan-christmas.jpg",
+      "url": "https://www.facebook.com/share/p/17WMHdTKZT/",
+      "feeling": "覺得興奮",
+      "place": "台南市"
+    },
+    {
+      "id": "2020-12-25-christmas-gift",
+      "title": "2020年12月25日 - 高雄市",
+      "time": "2020-12-25T18:00:00+08:00",
+      "message": "收到聖誕禮物，覺得好幸福喔。",
+      "image": "images/2020-12-25-christmas-gift.jpg",
+      "url": "https://www.facebook.com/share/p/1EQDNh3DTd/",
+      "feeling": "覺得好夢幻",
+      "place": "高雄市"
     }
 
   ]
