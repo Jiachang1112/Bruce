@@ -229,6 +229,36 @@
       "url": "https://www.facebook.com/share/p/19s2jQepRr/",
       "feeling": "覺得感激",
       "place": "台南市 奇美博物館"
+    },
+    {
+      "id": "2021-02-19-lantern-craft",
+      "title": "2021年2月19日 - 台南市",
+      "time": "2021-02-19T16:00:00+08:00",
+      "message": "燈籠。",
+      "image": "images/2021-02-19-lantern.jpg",
+      "url": "https://www.facebook.com/share/p/1DDqFwKhsE/",
+      "feeling": "覺得感恩",
+      "place": "台南市 小達人學苑"
+    },
+    {
+      "id": "2021-02-23-fo-guang-shan",
+      "title": "2021年2月23日 - 高雄市",
+      "time": "2021-02-23T19:00:00+08:00",
+      "message": "燈會 佛光山。",
+      "image": "images/2021-02-23-fo-guang-shan.jpg",
+      "url": "https://www.facebook.com/share/p/1FktqzSfZa/",
+      "feeling": "覺得興奮",
+      "place": "高雄市 佛光山佛陀紀念館"
+    },
+    {
+      "id": "2021-02-24-gift-exchange",
+      "title": "2021年2月24日 - 高雄市",
+      "time": "2021-02-24T20:00:00+08:00",
+      "message": "交換禮物🎁遊戲開始！",
+      "image": "images/2021-02-24-gift-exchange.jpg",
+      "url": "https://www.facebook.com/share/p/16XCTDBsJu/",
+      "feeling": "覺得可愛",
+      "place": "高雄市（在家）"
     }
   ]
 }
