@@ -79,6 +79,16 @@
       "url": "https://www.facebook.com/share/p/1BejznwR6e/",
       "feeling": "覺得感激",
       "place": "高雄市"
-    }
+    },
+    {
+      "id": "2020-12-02-christmas",
+      "date": "2020-12-02",
+      "place": "高雄市",
+      "feeling": "覺得開心",
+      "title": "2020年12月2日－高雄市",
+      "html": "<p><img src='https://yourdomain.com/assets/img/fb/2020-12-02.jpg' alt='聖誕節快樂' style='max-width:100%;border-radius:12px;'/></p><p>2020年大家（聖誕節🎄快樂）</p>",
+      "fbURL": "https://www.facebook.com/share/p/17mC5pqedR/"
+}
+
   ]
 }
