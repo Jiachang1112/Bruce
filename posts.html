@@ -10,151 +10,130 @@
 
   <style>
     :root {
-      /* 依照截圖調整的深色系配色 */
-      --bg-body: #0b1120;       /* 整體背景極深藍 */
-      --bg-card: #111827;       /* 卡片背景深灰藍 */
-      --bg-input: #1f2937;      /* 輸入框背景 */
-      --border: #374151;        /* 邊框顏色 */
-      --text-main: #f3f4f6;     /*主要文字白 */
-      --text-muted: #9ca3af;    /* 次要文字灰 */
-      
-      --badge-loc: #2563eb;     /* 地點標籤藍 */
-      --badge-feel: #4f46e5;    /* 心情標籤紫藍 (或根據喜好調整) */
-      --btn-primary: #1d4ed8;   /* 按鈕藍 */
+      --bg-dark:#0f172a;
+      --bg-light:#f8fafc;
+      --text-dark:#f1f5f9;
+      --text-light:#1e293b;
+      --muted-dark:#94a3b8;
+      --muted-light:#475569;
+      --border-dark:#334155;
+      --border-light:#d1d5db;
+      --accent-dark:#2563eb;
+      --accent-light:#3b82f6;
     }
 
     /* ====== Base ====== */
     body {
-      background-color: var(--bg-body);
-      color: var(--text-main);
-      font-family: system-ui, -apple-system, sans-serif;
+      background:var(--bg-dark);
+      color:var(--text-dark);
+      transition:background .3s,color .3s;
     }
 
-    /* 光明模式變數 (備用，若需要可自行調整) */
     [data-theme="light"] body {
-      --bg-body: #f9fafb;
-      --bg-card: #ffffff;
-      --bg-input: #ffffff;
-      --border: #e5e7eb;
-      --text-main: #1f2937;
-      --text-muted: #6b7280;
+      background:var(--bg-light);
+      color:var(--text-light);
     }
 
-    .sep { border:none; border-top:1px solid var(--border); margin:32px 0; }
+    .sep { border:none; border-top:1px solid var(--border-dark); margin:32px 0; }
+    [data-theme="light"] .sep { border-color:var(--border-light); }
 
     /* ===== Toolbar ===== */
     .toolbar {
       display:flex;
       flex-wrap:wrap;
-      gap:12px;
-      margin:20px 0 24px;
-      align-items: center;
+      gap:10px;
+      margin:12px 0 20px;
+      color:inherit;
     }
-    .toolbar .fld { display:flex; align-items:center; gap:8px; }
-    .toolbar label { font-weight:500; font-size: 0.95rem; color: var(--text-muted); }
-    
-    /* 輸入框樣式 - 仿截圖 */
+    .toolbar .fld { display:flex; align-items:center; gap:6px; }
+    .toolbar label { font-weight:500; opacity:.9; }
     .toolbar input[type="text"],
     .toolbar select,
     .toolbar input[type="date"] {
-      padding: 8px 12px;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      background-color: var(--bg-input);
-      color: var(--text-main);
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color .2s;
+      padding:8px 10px;
+      border:1px solid var(--border-dark);
+      border-radius:8px;
+      background-color:#1e293b;
+      color:var(--text-dark);
     }
-    .toolbar input:focus, .toolbar select:focus {
-      border-color: var(--badge-loc);
+    [data-theme="light"] .toolbar input[type="text"],
+    [data-theme="light"] .toolbar select,
+    [data-theme="light"] .toolbar input[type="date"] {
+      background-color:#fff;
+      border:1px solid var(--border-light);
+      color:var(--text-light);
     }
-
-    .toolbar input::placeholder { color:var(--text-muted); opacity: 0.7; }
-    .toolbar .help { font-size:.85rem; color:var(--text-muted); margin-left: auto; }
+    .toolbar input::placeholder { color:var(--muted-dark); }
+    [data-theme="light"] .toolbar input::placeholder { color:var(--muted-light); }
+    .toolbar .help { opacity:.8; font-size:.85rem; color:var(--muted-dark); }
+    [data-theme="light"] .toolbar .help { color:var(--muted-light); }
 
     /* ===== Card ===== */
     .card {
-      background-color: var(--bg-card);
-      border: 1px solid var(--border);
-      border-radius: 12px;
-      padding: 24px;
-      transition: transform .2s, box-shadow .2s;
+      background:var(--bg-dark);
+      border:1px solid var(--border-dark);
+      border-radius:12px;
+      padding:16px;
+      color:var(--text-dark);
+      line-height:1.7;
+      transition:background .3s,border .3s,box-shadow .2s;
     }
-    .card:hover {
-      border-color: #4b5563;
+    [data-theme="light"] .card {
+      background:#fff;
+      border:1px solid var(--border-light);
+      color:var(--text-light);
     }
-    
-    .card h3 { 
-      font-size: 1.25rem; 
-      margin: 0 0 12px 0; 
-      color: var(--text-main); 
-      font-weight: 600;
-      letter-spacing: 0.5px;
+    [data-theme="light"] .card:hover {
+      box-shadow:0 2px 6px rgba(0,0,0,.08);
     }
+    .card h3 { font-size:1.2rem; margin-bottom:6px; color:inherit; }
+    .card small { color:var(--muted-dark); }
+    [data-theme="light"] .card small { color:var(--muted-light); }
 
-    .meta-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      align-items: center;
-      margin-bottom: 16px;
-      font-size: 0.9rem;
-      color: var(--text-muted);
-    }
-
-    .card p.preview {
-      color: #d1d5db;
-      line-height: 1.6;
-      margin-bottom: 20px;
-      font-size: 0.95rem;
-    }
-
-    /* ===== Badges ===== */
+    /* ===== Badge ===== */
     .badge {
-      display: inline-block;
-      padding: 2px 10px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      color: #fff;
-      font-weight: 500;
+      background:var(--accent-dark);
+      color:#e0f2fe;
+      border-radius:6px;
+      padding:2px 8px;
+      font-size:.8rem;
     }
-    /* 地點標籤 - 亮藍色 */
-    .badge.loc { background-color: #3b82f6; }
-    /* 心情標籤 - 類似截圖的淡藍/青色 */
-    .badge.feel { background-color: #6366f1; } 
+    [data-theme="light"] .badge {
+      background:var(--accent-light);
+      color:#fff;
+    }
 
     /* ===== Buttons ===== */
     .btn {
-      display: inline-flex;
-      align-items: center;
-      background-color: #1f2937; /* 深色按鈕底 */
-      color: #9ca3af;
-      border: 1px solid var(--border);
-      border-radius: 6px;
-      padding: 8px 16px;
-      text-decoration: none;
-      font-size: 0.9rem;
-      transition: .2s;
+      background:var(--accent-dark);
+      color:#fff;
+      border:none;
+      border-radius:8px;
+      padding:6px 14px;
+      text-decoration:none;
+      transition:.2s;
     }
-    .btn:hover {
-      background-color: #374151;
-      color: #fff;
+    .btn:hover { background:#1d4ed8; }
+    [data-theme="light"] .btn {
+      background:var(--accent-light);
+      color:#fff;
     }
-    /* 閱讀全文按鈕特別樣式 */
-    .btn.read-more {
-      background-color: #1e3a8a; /* 深藍底 */
-      color: #bfdbfe;           /* 淺藍字 */
-      border: 1px solid #1e40af;
+    [data-theme="light"] .btn:hover {
+      background:#2563eb;
     }
-    .btn.read-more:hover {
-      background-color: #1d4ed8;
-      color: #fff;
-    }
-
     .btn.sm {
       padding:4px 10px;
       font-size:.85rem;
+      background:#334155;
+      color:#f8fafc;
+    }
+    .btn.sm:hover { background:#475569; }
+    [data-theme="light"] .btn.sm {
+      background:#e2e8f0;
+      color:#1e293b;
+    }
+    [data-theme="light"] .btn.sm:hover {
+      background:#cbd5e1;
     }
   </style>
 </head>
@@ -177,11 +156,12 @@
   </nav>
 
   <main class="container section">
-    <h1 id="pageTitle" style="margin:0 0 4px">文章</h1>
+    <h1 id="pageTitle" style="margin:0 0 12px">文章</h1>
 
+    <!-- 工具列：搜尋 + 篩選 -->
     <div id="toolbar" class="toolbar">
-      <div class="fld" style="flex-grow: 1; max-width: 300px;">
-        <input id="q" type="text" style="width:100%" placeholder="搜尋標題／內文／地點／心情…"/>
+      <div class="fld">
+        <input id="q" type="text" placeholder="搜尋標題／內文／地點／心情…（即時篩選）"/>
       </div>
       <div class="fld">
         <label for="place">地點</label>
@@ -211,40 +191,35 @@
 
     <div id="list" class="grid"></div>
     <hr class="sep"/>
-    <article id="viewer" class="card" style="display:none; border:none; background:transparent; padding:0;"></article>
+    <article id="viewer" class="card" style="display:none"></article>
   </main>
 
   <script>
   const strip = s => s?.replace(/<[^>]+>/g,'') || '';
   const fmtDate = s => {
     const d = new Date(s);
-    // 格式化成 2021/02/24 的樣子
     return isNaN(d) ? s : d.toLocaleDateString('zh-TW',{year:'numeric',month:'2-digit',day:'2-digit'});
   };
-  // 產生不同顏色的 Badge
-  const badge = (t, type) => `<span class="badge ${type}">${t}</span>`;
+  const badge = t => `<span class="badge">${t}</span>`;
   const debounce = (fn,ms=200)=>{let t;return(...a)=>{clearTimeout(t);t=setTimeout(()=>fn(...a),ms)}};
 
   function renderList(items){
     const list = document.getElementById('list');
-    if(!items.length){ list.innerHTML='<p style="opacity:.8; padding:20px">找不到符合條件的文章。</p>'; return; }
-    
+    if(!items.length){ list.innerHTML='<p style="opacity:.8">找不到符合條件的文章。</p>'; return; }
     list.innerHTML = items.map(p=>{
       const title = p.title || `${fmtDate(p.date)} - ${p.place||''}`;
-      const preview = strip(p.html||p.message||'').slice(0, 100) + '...';
-      
-      // 組合 HTML：依照截圖樣式
+      const preview = strip(p.html||p.message||'').slice(0,110) + '…';
       return `
         <article class="card">
           <h3>${title}</h3>
-          <div class="meta-row">
-            <span>${fmtDate(p.date)}</span>
+          <div style="display:flex; gap:8px; align-items:center; margin:6px 0 10px">
+            <small>${fmtDate(p.date)}</small>
             <span>•</span>
-            ${p.place ? badge(p.place, 'loc') : ''}
-            ${p.feeling ? badge(p.feeling, 'feel') : ''}
+            ${p.place?badge(p.place):''}
+            ${p.feeling?badge(p.feeling):''}
           </div>
-          <p class="preview">${preview}</p>
-          <div><a class="btn read-more" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a></div>
+          <p style="opacity:.95">${preview}</p>
+          <p><a class="btn" href="posts.html#${encodeURIComponent(p.id)}">閱讀全文</a></p>
         </article>`;
     }).join('');
   }
@@ -256,20 +231,16 @@
     document.getElementById('pageTitle').textContent=title;
     document.title=`${title}｜我的網站`;
     const fbBtn=p.fbURL?`<p><a class="btn sm" href="${p.fbURL}" target="_blank">在 Facebook 查看 ↗</a></p>`:'';
-    
-    // 檢視單篇文章時也套用相同的 badge 樣式
     v.innerHTML=`
-      <p><a class="btn" href="posts.html">← 返回列表</a></p>
-      <div class="card" style="margin-top:20px">
-        <h2 style="margin-top:0">${title}</h2>
-        <div class="meta-row" style="margin-bottom:20px; padding-bottom:10px; border-bottom:1px solid var(--border)">
-          <span>${fmtDate(p.date)}</span><span>•</span>
-          ${p.place ? badge(p.place, 'loc') : ''}
-          ${p.feeling ? badge(p.feeling, 'feel') : ''}
-        </div>
-        ${fbBtn}
-        <div style="line-height:1.8; font-size:1.05rem;">${p.html||''}</div>
-      </div>`;
+      <p><a class="btn sm" href="posts.html">← 返回列表</a></p>
+      <h2>${title}</h2>
+      <div style="display:flex; gap:8px; align-items:center; margin:0 0 14px">
+        <small>${fmtDate(p.date)}</small><span>•</span>
+        ${p.place?badge(p.place):''}
+        ${p.feeling?badge(p.feeling):''}
+      </div>
+      ${fbBtn}
+      <div>${p.html||''}</div>`;
     window.scrollTo({top:0,behavior:'smooth'});
   }
 
@@ -327,61 +298,37 @@
 
   async function boot(){
     const listEl=document.getElementById('list');
-    listEl.innerHTML='<p style="padding:20px; opacity:0.7">載入中…</p>';
-    
+    listEl.innerHTML='載入中…';
     async function fetchJSON(path){
       const res=await fetch(path+'?v='+Date.now(),{cache:'no-store'});
       if(!res.ok)throw new Error('HTTP '+res.status);
       return res.json();
     }
-    
     let raw;
-    // 嘗試不同的路徑以確保本地或 GitHub Pages 都能讀取
     try{raw=await fetchJSON('assets/js/posts.json');}
     catch{try{raw=await fetchJSON('Bruce/assets/js/posts.json');}
-      catch(e){listEl.innerHTML='<p style="padding:20px">❌ 讀取失敗，請確認 assets/js/posts.json 存在。</p>';return;}
+      catch(e){listEl.innerHTML='<p>❌ 讀取失敗。</p>';return;}
     }
-
     if(Array.isArray(raw)){
       ALL=raw.map(p=>({id:String(p.id),title:p.title||'',date:p.date||'',place:p.place||'',feeling:p.feeling||'',html:p.html||'',message:p.message||'',fbURL:p.fbURL||p.url||''}));
     }else if(raw&&Array.isArray(raw.items)){
       ALL=raw.items.map(p=>{
         const date=(p.time||'').slice(0,10);
-        // 如果沒有 title，自動產生 title
-        const displayTitle = p.title || `${fmtDate(date)} - ${p.place||'生活紀錄'}`;
-        
-        // 處理內文顯示
-        let htmlContent = '';
-        if(p.image) htmlContent += `<p><img src="${p.image}" alt="photo" style="max-width:100%; border-radius:8px; border:1px solid #374151"/></p>`;
-        if(p.message) htmlContent += `<p>${p.message.replace(/\n/g,'<br>')}</p>`;
-        
-        return {
-            id: String(p.id),
-            title: displayTitle,
-            date: date,
-            place: p.place||'',
-            feeling: p.feeling||'',
-            html: htmlContent,
-            message: p.message||'',
-            fbURL: p.url||''
-        };
+        const html=(p.image?`<p><img src="${p.image}" alt="" style="max-width:100%;border-radius:12px"/></p>`:'')+
+          `<p style="opacity:.85">時間：${new Date(p.time).toLocaleString('zh-TW',{hour12:false})}${p.place?'｜地點：'+p.place:''}${p.feeling?'｜心情：'+p.feeling:''}</p>`+
+          `<div>${(p.message||'').replace(/\n/g,'<br>')}</div>`;
+        return{id:String(p.id),title:p.title||`${fmtDate(date)} - ${p.place||''}`,date,place:p.place||'',feeling:p.feeling||'',html,message:p.message||'',fbURL:p.url||''};
       });
     }
     ALL.sort((a,b)=>(a.date<b.date?1:-1));
-    buildToolbarOptions();
-    bindToolbar();
-    applyFilters();
-    
+    buildToolbarOptions();bindToolbar();applyFilters();
     function route(){
       const h=location.hash.slice(1);
       if(!h){showListMode();return;}
       const p=ALL.find(x=>String(x.id)===decodeURIComponent(h));
       p? (showViewMode(),renderViewer(p)) : showListMode();
     }
-    route();
-    window.addEventListener('hashchange',route);
-
-    // 主題切換邏輯
+    route();window.addEventListener('hashchange',route);
     const t=localStorage.getItem('theme');
     if(t)document.documentElement.dataset.theme=t;
     document.getElementById('themeToggle').addEventListener('click',()=>{
