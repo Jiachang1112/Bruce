@@ -1,0 +1,295 @@
+<!doctype html>
+<html lang="zh-Hant" data-theme="dark">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>網站後台編輯器</title>
+  <link rel="stylesheet" href="assets/css/style.css"/>
+  <style>
+    /* 後台專用樣式 */
+    body { padding-bottom: 100px; }
+    .editor-container { display: grid; grid-template-columns: 300px 1fr; gap: 20px; align-items: start; }
+    .sidebar { height: calc(100vh - 100px); overflow-y: auto; background: var(--bg-card); border: 1px solid var(--line); border-radius: 12px; padding: 10px; }
+    .post-item { padding: 10px; border-bottom: 1px solid var(--line); cursor: pointer; font-size: 0.9rem; }
+    .post-item:hover { background: rgba(255,255,255,0.05); }
+    .post-item.active { background: var(--brand); color: #fff; border-radius: 6px; }
+    
+    .form-panel { background: var(--bg-card); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; margin-bottom: 6px; opacity: 0.8; font-weight: bold; }
+    .form-group input, .form-group textarea, .form-group select { 
+      width: 100%; padding: 10px; border-radius: 8px; 
+      border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+      font-family: inherit;
+    }
+    .form-group textarea { height: 150px; resize: vertical; }
+    
+    .actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid var(--line); }
+    .btn-success { background: #10b981 !important; color: white !important; border: none; cursor: pointer;}
+    .btn-danger { background: #ef4444 !important; color: white !important; border: none; cursor: pointer;}
+    .btn-copy { background: #f59e0b !important; color: white !important; width: 100%; justify-content: center; font-size: 1.2rem; padding: 15px;}
+
+    .output-area { margin-top: 30px; padding: 20px; background: #000; border-radius: 12px; border: 1px solid #333; display: none; }
+    .output-area textarea { width: 100%; height: 200px; background: #111; color: #0f0; font-family: monospace; border: none; margin-top: 10px;}
+    
+    @media(max-width: 768px) {
+      .editor-container { grid-template-columns: 1fr; }
+      .sidebar { height: 200px; }
+    }
+  </style>
+</head>
+<body>
+  <nav class="nav">
+    <div class="container wrap">
+      <a class="brand" href="index.html"><b>網站後台編輯器</b></a>
+      <div class="right">
+        <a href="posts.html" target="_blank">預覽網站 ↗</a>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container section">
+    <div class="card" style="margin-bottom: 20px; background: #1e293b; border-color: #334155;">
+      <h3 style="margin-top:0">使用說明</h3>
+      <ol style="margin-bottom:0; padding-left: 20px; opacity: 0.9;">
+        <li>在左側選擇文章進行修改，或點擊「＋ 新增文章」。</li>
+        <li>填寫右側表單（照片請填入 `images/檔名.jpg`）。</li>
+        <li>編輯完成後，務必按下 **「更新/儲存此文章」**。</li>
+        <li>全部改好後，按最下方的橘色按鈕 **「複製完整程式碼」**。</li>
+        <li>回到 GitHub，打開 `assets/js/posts.json`，全選貼上即可！</li>
+      </ol>
+    </div>
+
+    <div class="editor-container">
+      <div class="sidebar">
+        <div class="post-item" onclick="createNew()" style="font-weight:bold; color: var(--brand2); text-align:center; border:1px dashed var(--line); margin-bottom:10px;">＋ 新增文章</div>
+        <div id="postList">載入中...</div>
+      </div>
+
+      <div class="form-panel">
+        <div class="form-group">
+          <label>文章 ID (英文代號，不可重複)</label>
+          <input type="text" id="p_id" placeholder="例如：2025-01-01-new-year">
+        </div>
+        <div class="form-group">
+          <label>標題 (Title)</label>
+          <input type="text" id="p_title" placeholder="例如：2025年1月1日 - 台北跨年">
+        </div>
+        <div class="form-group" style="display:grid; grid-template-columns: 1fr 1fr; gap:10px">
+          <div>
+            <label>日期 (Date)</label>
+            <input type="date" id="p_date_input">
+          </div>
+          <div>
+            <label>時間 (Time)</label>
+            <input type="time" id="p_time_input">
+          </div>
+        </div>
+        <div class="form-group">
+          <label>地點 (Place)</label>
+          <input type="text" id="p_place" placeholder="例如：路竹區">
+        </div>
+        <div class="form-group">
+          <label>心情 (Feeling)</label>
+          <input type="text" id="p_feeling" placeholder="例如：覺得開心">
+        </div>
+        <div class="form-group">
+          <label>照片路徑 (Image)</label>
+          <input type="text" id="p_image" placeholder="images/你的照片.jpg">
+          <small style="opacity:0.6">請確認照片已上傳到 images/ 資料夾</small>
+        </div>
+        <div class="form-group">
+          <label>文章內容 (Message)</label>
+          <textarea id="p_message" placeholder="請輸入內文..."></textarea>
+        </div>
+        
+        <div class="actions">
+          <button class="btn btn-success" style="flex:2" onclick="saveCurrentPost()">💾 更新/儲存此文章</button>
+          <button class="btn btn-danger" onclick="deleteCurrentPost()">🗑️ 刪除</button>
+        </div>
+      </div>
+    </div>
+
+    <div style="margin-top: 40px;">
+      <button class="btn btn-copy" onclick="generateJSON()">📋 複製完整程式碼 (準備貼回 GitHub)</button>
+      <p id="copyTip" style="text-align:center; margin-top:10px; color:#10b981; display:none;">✅ 已複製！請去 GitHub 的 posts.json 貼上。</p>
+    </div>
+
+    <div id="output" class="output-area">
+      <p>這是產生出來的程式碼 (如果不方便複製，可以手動複製這裡)：</p>
+      <textarea id="jsonOutput"></textarea>
+    </div>
+
+  </main>
+
+  <script>
+  let allPosts = [];
+  let currentId = null;
+
+  // 1. 啟動時讀取現有的 posts.json
+  async function init() {
+    try {
+      // 嘗試抓取網路上或本地的 posts.json
+      const res = await fetch('assets/js/posts.json?v=' + Date.now());
+      const data = await res.json();
+      if (data.items) {
+        allPosts = data.items;
+      } else if (Array.isArray(data)) {
+        allPosts = data;
+      }
+      renderList();
+      // 預設選取第一篇
+      if(allPosts.length > 0) loadPost(0);
+    } catch (e) {
+      document.getElementById('postList').innerHTML = '<p style="padding:10px; color:red">讀取失敗，請確認 assets/js/posts.json 存在。</p>';
+      console.error(e);
+    }
+  }
+
+  // 2. 渲染左側列表
+  function renderList() {
+    const listEl = document.getElementById('postList');
+    listEl.innerHTML = '';
+    
+    // 依照時間排序 (新 -> 舊)
+    allPosts.sort((a, b) => new Date(b.time) - new Date(a.time));
+
+    allPosts.forEach((p, index) => {
+      const div = document.createElement('div');
+      div.className = `post-item ${p.id === currentId ? 'active' : ''}`;
+      // 顯示標題或日期
+      div.textContent = p.title || p.time.split('T')[0];
+      div.onclick = () => loadPost(index);
+      listEl.appendChild(div);
+    });
+  }
+
+  // 3. 讀取單一文章到表單
+  function loadPost(index) {
+    const p = allPosts[index];
+    currentId = p.id;
+    
+    document.getElementById('p_id').value = p.id || '';
+    document.getElementById('p_title').value = p.title || '';
+    document.getElementById('p_place').value = p.place || '';
+    document.getElementById('p_feeling').value = p.feeling || '';
+    document.getElementById('p_image').value = p.image || '';
+    document.getElementById('p_message').value = p.message || '';
+
+    // 處理日期時間格式 ISO 轉 input
+    if(p.time) {
+      const d = new Date(p.time);
+      // 轉成 YYYY-MM-DD
+      const dateStr = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+      // 轉成 HH:mm
+      const timeStr = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+      
+      document.getElementById('p_date_input').value = dateStr;
+      document.getElementById('p_time_input').value = timeStr;
+    }
+
+    renderList(); // 更新選取狀態
+  }
+
+  // 4. 清空表單 (新增模式)
+  function createNew() {
+    currentId = null;
+    // 自動生成今天的 ID
+    const today = new Date();
+    const dateStr = today.toISOString().split('T')[0];
+    
+    document.getElementById('p_id').value = `${dateStr}-new-post`;
+    document.getElementById('p_title').value = `${today.getFullYear()}年${today.getMonth()+1}月${today.getDate()}日 - `;
+    document.getElementById('p_place').value = '';
+    document.getElementById('p_feeling').value = '';
+    document.getElementById('p_image').value = 'images/';
+    document.getElementById('p_message').value = '';
+    
+    document.getElementById('p_date_input').value = dateStr;
+    document.getElementById('p_time_input').value = "12:00";
+    
+    // 移除列表選取狀態
+    document.querySelectorAll('.post-item').forEach(el => el.classList.remove('active'));
+  }
+
+  // 5. 儲存/更新記憶體中的文章
+  function saveCurrentPost() {
+    const id = document.getElementById('p_id').value;
+    if(!id) { alert('請輸入文章 ID'); return; }
+
+    // 組合日期時間
+    const dInput = document.getElementById('p_date_input').value;
+    const tInput = document.getElementById('p_time_input').value;
+    const fullTime = `${dInput}T${tInput}:00+08:00`;
+
+    const newPost = {
+      id: id,
+      title: document.getElementById('p_title').value,
+      time: fullTime,
+      place: document.getElementById('p_place').value,
+      feeling: document.getElementById('p_feeling').value,
+      image: document.getElementById('p_image').value,
+      message: document.getElementById('p_message').value,
+      url: "#" // 預設
+    };
+
+    // 檢查是新增還是修改
+    const existingIndex = allPosts.findIndex(p => p.id === currentId); // 找舊 ID
+    
+    if (existingIndex >= 0) {
+      // 更新
+      allPosts[existingIndex] = newPost;
+      alert('文章已更新！(記得最後要按複製程式碼)');
+    } else {
+      // 檢查新 ID 是否重複
+      if(allPosts.find(p => p.id === id)) {
+        // ID 重複，覆蓋它
+        const idx = allPosts.findIndex(p => p.id === id);
+        allPosts[idx] = newPost;
+        alert('ID 重複，已覆蓋舊文章。');
+      } else {
+        // 真新增
+        allPosts.unshift(newPost); // 加到最前面
+        alert('新文章已加入列表！');
+      }
+    }
+    
+    currentId = id;
+    renderList();
+  }
+
+  // 6. 刪除
+  function deleteCurrentPost() {
+    if(!currentId) return;
+    if(!confirm('確定要刪除這篇文章嗎？')) return;
+    allPosts = allPosts.filter(p => p.id !== currentId);
+    renderList();
+    if(allPosts.length > 0) loadPost(0);
+    else createNew();
+  }
+
+  // 7. 產生並複製 JSON
+  function generateJSON() {
+    const finalObj = { items: allPosts };
+    const jsonStr = JSON.stringify(finalObj, null, 2);
+    
+    const outDiv = document.getElementById('output');
+    const outText = document.getElementById('jsonOutput');
+    outDiv.style.display = 'block';
+    outText.value = jsonStr;
+
+    // 複製到剪貼簿
+    navigator.clipboard.writeText(jsonStr).then(() => {
+      const tip = document.getElementById('copyTip');
+      tip.style.display = 'block';
+      setTimeout(() => tip.style.display='none', 5000);
+      alert('程式碼已複製！\n\n現在請去 GitHub，打開 assets/js/posts.json，\n把內容「全部刪除」，然後「貼上」新的。');
+    }).catch(err => {
+      alert('自動複製失敗，請手動複製下方的程式碼框框。');
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', init);
+  </script>
+</body>
+</html>
